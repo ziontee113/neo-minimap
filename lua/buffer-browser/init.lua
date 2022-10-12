@@ -1,5 +1,9 @@
 local M = {}
 
+-- TODO: Add custom keymap support
+-- TODO: Add constructor function for end-user
+-- TODO: Add hot query swapping functionality
+
 -- local ts_utils = require("nvim-treesitter.ts_utils")
 local ns = vim.api.nvim_create_namespace("buffer-brower-ns")
 
@@ -156,6 +160,19 @@ M.browse = function(opts)
 			if opts.auto then
 				jump_and_zz()
 			end
+		end,
+	})
+end
+
+local augroup = vim.api.nvim_create_augroup("BufferBrowser", {})
+M.set = function(keymap, pattern, opts)
+	vim.api.nvim_create_autocmd({ "FileType" }, {
+		pattern = pattern,
+		group = augroup,
+		callback = function()
+			vim.keymap.set("n", keymap, function()
+				M.browse(opts)
+			end, { buffer = 0 })
 		end,
 	})
 end
