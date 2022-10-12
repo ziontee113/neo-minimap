@@ -4,7 +4,7 @@ local M = {}
 local ns = vim.api.nvim_create_namespace("buffer-brower-ns")
 
 local function set_lnum_extmarks(buf, lnumLines, opts)
-	local line_max = tonumber(#tostring(lnumLines[#lnumLines or 0] or 0))
+	local line_max = tonumber(#tostring(lnumLines[#lnumLines]))
 
 	for i, lnum in ipairs(lnumLines) do
 		local str = tostring(lnum + 1)
@@ -59,14 +59,15 @@ local function buffer_query_processor(opts)
 	local trees = parser:parse()
 	local root = trees[1]:root()
 
-	local iter_query = vim.treesitter.query.parse_query(opts.filetype, opts.query)
+	local ok, iter_query = pcall(vim.treesitter.query.parse_query, opts.filetype, opts.query)
+	if ok then
+		for _, matches, _ in iter_query:iter_matches(root, 0) do
+			local row = matches[1]:range()
 
-	for _, matches, _ in iter_query:iter_matches(root, 0) do
-		local row = matches[1]:range()
-
-		local line_text = vim.api.nvim_buf_get_lines(0, row, row + 1, false)[1]
-		table.insert(return_tbl.textLines, string.rep(" ", #tostring(row)) .. "\t" .. line_text)
-		table.insert(return_tbl.lnumLines, row)
+			local line_text = vim.api.nvim_buf_get_lines(0, row, row + 1, false)[1]
+			table.insert(return_tbl.textLines, string.rep(" ", #tostring(row)) .. "\t" .. line_text)
+			table.insert(return_tbl.lnumLines, row)
+		end
 	end
 
 	return return_tbl
@@ -79,6 +80,10 @@ local defaults = {
 
 M.browse = function(opts)
 	local line_data = buffer_query_processor(opts)
+	if #line_data.lnumLines == 0 then
+		print("0 targets for buffer-browser")
+		return
+	end
 
 	for k, v in pairs(defaults) do
 		if opts[k] == nil then
