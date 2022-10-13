@@ -48,6 +48,7 @@ nm.set("zi", "lua", { -- press `zi` to open the minimap, in `lua` files
 })
 ```
 
+Example for Typescript:
 ```lua
 local nm = require("neo-minimap") -- for shorthand use later
 
@@ -63,8 +64,6 @@ nm.set("zi", "typescriptreact", {  -- press `zi` to open the minimap, in `typesc
 ```
 
 https://user-images.githubusercontent.com/102876811/195559769-0373bc88-9cba-4731-a7d2-7ec5c461b569.mp4
-
-
 
 ## Minimap Specific Mappings
 
