@@ -6,7 +6,7 @@ local M = {}
 -- local ts_utils = require("nvim-treesitter.ts_utils")
 local ns = vim.api.nvim_create_namespace("buffer-brower-ns")
 
-local function set_lnum_extmarks(buf, lnumLines, opts)
+local function __set_lnum_extmarks(buf, lnumLines, opts)
 	local line_max = tonumber(#tostring(lnumLines[#lnumLines]))
 
 	for i, lnum in ipairs(lnumLines) do
@@ -68,6 +68,8 @@ local function buffer_query_processor(opts)
 		for _, matches, _ in iter_query:iter_matches(root, 0) do
 			local row, col = matches[1]:range()
 
+			__set_lnum_extmarks()
+
 			local line_text = vim.api.nvim_buf_get_lines(0, row, row + 1, false)[1]
 			table.insert(return_tbl.textLines, string.rep(" ", #tostring(row)) .. "\t" .. line_text)
 			table.insert(return_tbl.lnumLines, row)
@@ -82,6 +84,35 @@ local defaults = {
 	hl_group = "DiagnosticWarn",
 	auto = true,
 }
+
+local function jump_and_zz(line_data)
+	local curLine = vim.api.nvim_win_get_cursor(0)[1]
+	vim.api.nvim_win_set_cursor(line_data.oldWin, { line_data.lnumLines[curLine] + 1, line_data.lcolLines[curLine] })
+
+	vim.api.nvim_win_call(line_data.oldWin, function()
+		vim.cmd([[normal! zz]])
+	end)
+end
+
+local function __mappings_handling(buf, win, line_data, opts)
+	-- add cutom user buffer mappings here
+	vim.keymap.set("n", "q", ":q!<cr>", { buffer = buf })
+	vim.keymap.set("n", "<Esc>", ":q!<cr>", { buffer = buf })
+	vim.keymap.set("n", "t", ":TSBufToggle highlight<cr>", { buffer = buf })
+	vim.keymap.set("n", "h", ":TSBufToggle highlight<cr>", { buffer = buf })
+	vim.keymap.set("n", "a", function()
+		opts.auto = not opts.auto
+	end, { buffer = buf })
+	vim.keymap.set("n", "l", function()
+		jump_and_zz(line_data)
+	end, { buffer = buf })
+	vim.keymap.set("n", "<CR>", function()
+		jump_and_zz(line_data)
+		vim.api.nvim_win_close(win, true)
+
+		vim.fn.win_gotoid(line_data.oldWin)
+	end, { buffer = buf })
+end
 
 M.browse = function(opts)
 	local line_data = buffer_query_processor(opts)
@@ -124,37 +155,9 @@ M.browse = function(opts)
 
 	vim.api.nvim_buf_set_lines(buf, 0, -1, false, line_data.textLines or {})
 
-	set_lnum_extmarks(buf, line_data.lnumLines, opts)
+	__set_lnum_extmarks(buf, line_data.lnumLines, opts)
 
-	local function jump_and_zz()
-		local curLine = vim.api.nvim_win_get_cursor(0)[1]
-		vim.api.nvim_win_set_cursor(
-			line_data.oldWin,
-			{ line_data.lnumLines[curLine] + 1, line_data.lcolLines[curLine] }
-		)
-
-		vim.api.nvim_win_call(line_data.oldWin, function()
-			vim.cmd([[normal! zz]])
-		end)
-	end
-
-	-- add cutom user buffer mappings here
-	vim.keymap.set("n", "q", ":q!<cr>", { buffer = buf })
-	vim.keymap.set("n", "<Esc>", ":q!<cr>", { buffer = buf })
-	vim.keymap.set("n", "t", ":TSBufToggle highlight<cr>", { buffer = buf })
-	vim.keymap.set("n", "h", ":TSBufToggle highlight<cr>", { buffer = buf })
-	vim.keymap.set("n", "a", function()
-		opts.auto = not opts.auto
-	end, { buffer = buf })
-	vim.keymap.set("n", "l", function()
-		jump_and_zz()
-	end, { buffer = buf })
-	vim.keymap.set("n", "<CR>", function()
-		jump_and_zz()
-		vim.api.nvim_win_close(win, true)
-
-		vim.fn.win_gotoid(line_data.oldWin)
-	end, { buffer = buf })
+	__mappings_handling(buf, win, line_data, opts)
 
 	local group = vim.api.nvim_create_augroup("Augroup Name", { clear = true })
 	vim.api.nvim_create_autocmd("CursorMoved", {
@@ -162,7 +165,7 @@ M.browse = function(opts)
 		group = group,
 		callback = function()
 			if opts.auto then
-				jump_and_zz()
+				jump_and_zz(line_data)
 			end
 		end,
 	})
