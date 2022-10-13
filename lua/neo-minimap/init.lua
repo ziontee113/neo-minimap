@@ -1,7 +1,7 @@
 local M = {}
 
--- TODO: Add custom keymap support
 -- TODO: Add hot query swapping / filtering functionality
+-- TODO: Add current cursor position when initiate Window Maker
 
 -- local ts_utils = require("nvim-treesitter.ts_utils")
 local ns = vim.api.nvim_create_namespace("buffer-brower-ns")
@@ -20,7 +20,7 @@ local function __set_lnum_extmarks(buf, lnumLines, opts)
 	end
 end
 
-local function buffer_query_processor(opts)
+local function __buffer_query_processor(opts)
 	local return_tbl = {
 		textLines = {},
 		lnumLines = {},
@@ -92,6 +92,7 @@ local function jump_and_zz(line_data)
 	end)
 end
 
+local old_search_pattern = ""
 local function __mappings_handling(buf, win, line_data, opts)
 	-- add cutom user buffer mappings here
 	vim.keymap.set("n", "q", ":q!<cr>", { buffer = buf })
@@ -110,10 +111,31 @@ local function __mappings_handling(buf, win, line_data, opts)
 
 		vim.fn.win_gotoid(line_data.oldWin)
 	end, { buffer = buf })
+
+	if opts.search_patterns then
+		for _, v in ipairs(opts.search_patterns) do
+			local pattern, keymap, forward = unpack(v)
+			vim.keymap.set("n", keymap, function()
+				if forward == true then
+					if old_search_pattern ~= pattern then
+						vim.cmd("/" .. pattern)
+					else
+						vim.cmd("norm! n")
+					end
+				elseif forward == false then
+					if old_search_pattern ~= pattern then
+						vim.cmd("?" .. pattern)
+					else
+						vim.cmd("norm! N")
+					end
+				end
+			end, { buffer = buf })
+		end
+	end
 end
 
 M.browse = function(opts)
-	local line_data = buffer_query_processor(opts)
+	local line_data = __buffer_query_processor(opts)
 	if #line_data.lnumLines == 0 then
 		print("0 targets for buffer-browser")
 		return
@@ -147,7 +169,7 @@ M.browse = function(opts)
 
 	vim.api.nvim_win_set_option(win, "winhl", "Normal:")
 	vim.api.nvim_win_set_option(win, "scrolloff", 2)
-	vim.api.nvim_win_set_option(win, "conceallevel", 2)
+	vim.api.nvim_win_set_option(win, "conceallevel", 0)
 	vim.api.nvim_win_set_option(win, "concealcursor", "n")
 	vim.api.nvim_win_set_option(win, "cursorline", true)
 
