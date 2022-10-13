@@ -68,8 +68,6 @@ local function buffer_query_processor(opts)
 		for _, matches, _ in iter_query:iter_matches(root, 0) do
 			local row, col = matches[1]:range()
 
-			__set_lnum_extmarks()
-
 			local line_text = vim.api.nvim_buf_get_lines(0, row, row + 1, false)[1]
 			table.insert(return_tbl.textLines, string.rep(" ", #tostring(row)) .. "\t" .. line_text)
 			table.insert(return_tbl.lnumLines, row)
@@ -156,7 +154,6 @@ M.browse = function(opts)
 	vim.api.nvim_buf_set_lines(buf, 0, -1, false, line_data.textLines or {})
 
 	__set_lnum_extmarks(buf, line_data.lnumLines, opts)
-
 	__mappings_handling(buf, win, line_data, opts)
 
 	local group = vim.api.nvim_create_augroup("Augroup Name", { clear = true })
