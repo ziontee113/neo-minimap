@@ -1,8 +1,7 @@
 local M = {}
 
 -- TODO: Add custom keymap support
--- TODO: Add constructor function for end-user
--- TODO: Add hot query swapping functionality
+-- TODO: Add hot query swapping / filtering functionality
 
 -- local ts_utils = require("nvim-treesitter.ts_utils")
 local ns = vim.api.nvim_create_namespace("buffer-brower-ns")
@@ -25,6 +24,7 @@ local function buffer_query_processor(opts)
 	local return_tbl = {
 		textLines = {},
 		lnumLines = {},
+		lcolLines = {},
 		oldBuf = vim.api.nvim_get_current_buf(),
 		oldWin = vim.api.nvim_get_current_win(),
 	}
@@ -66,11 +66,12 @@ local function buffer_query_processor(opts)
 	local ok, iter_query = pcall(vim.treesitter.query.parse_query, opts.filetype, opts.query)
 	if ok then
 		for _, matches, _ in iter_query:iter_matches(root, 0) do
-			local row = matches[1]:range()
+			local row, col = matches[1]:range()
 
 			local line_text = vim.api.nvim_buf_get_lines(0, row, row + 1, false)[1]
 			table.insert(return_tbl.textLines, string.rep(" ", #tostring(row)) .. "\t" .. line_text)
 			table.insert(return_tbl.lnumLines, row)
+			table.insert(return_tbl.lcolLines, col)
 		end
 	end
 
@@ -127,7 +128,10 @@ M.browse = function(opts)
 
 	local function jump_and_zz()
 		local curLine = vim.api.nvim_win_get_cursor(0)[1]
-		vim.api.nvim_win_set_cursor(line_data.oldWin, { line_data.lnumLines[curLine] + 1, 0 })
+		vim.api.nvim_win_set_cursor(
+			line_data.oldWin,
+			{ line_data.lnumLines[curLine] + 1, line_data.lcolLines[curLine] }
+		)
 
 		vim.api.nvim_win_call(line_data.oldWin, function()
 			vim.cmd([[normal! zz]])
