@@ -43,3 +43,13 @@ nm.set("zi", "lua", { -- press `zi` to open the minimap, in `lua` files
 	},
 })
 ```
+
+## Minimap Specific Mappings
+
+- `a` - Toggle `auto_jump`
+- `c` - Toggle `conceallevel`
+- `q` / `Esc` - close the Minimap
+- `h` / `t` - toggle Treesitter highlighting for Minimap
+
+- `l` - jump to location (for when `auto_jump` is `false`), doesn't close Minimap.
+- `Enter` - jump to location, closes Minimap.
