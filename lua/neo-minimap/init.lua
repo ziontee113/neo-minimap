@@ -2,6 +2,7 @@ local M = {}
 
 -- TODO: Add hot query swapping / filtering functionality
 -- TODO: Add current cursor position when initiate Window Maker
+-- TODO: Handle duplications
 
 -- local ts_utils = require("nvim-treesitter.ts_utils")
 local ns = vim.api.nvim_create_namespace("buffer-brower-ns")
@@ -65,13 +66,17 @@ local function __buffer_query_processor(opts)
 
 	local ok, iter_query = pcall(vim.treesitter.query.parse_query, opts.filetype, opts.query)
 	if ok then
+		local duplications_hashmap_check = {}
 		for _, matches, _ in iter_query:iter_matches(root, 0) do
 			local row, col = matches[1]:range()
 
-			local line_text = vim.api.nvim_buf_get_lines(0, row, row + 1, false)[1]
-			table.insert(return_tbl.textLines, string.rep(" ", #tostring(row)) .. "\t" .. line_text)
-			table.insert(return_tbl.lnumLines, row)
-			table.insert(return_tbl.lcolLines, col)
+			if not duplications_hashmap_check[row] then
+				local line_text = vim.api.nvim_buf_get_lines(0, row, row + 1, false)[1]
+				table.insert(return_tbl.textLines, string.rep(" ", #tostring(row)) .. "\t" .. line_text)
+				table.insert(return_tbl.lnumLines, row)
+				table.insert(return_tbl.lcolLines, col)
+				duplications_hashmap_check[row] = true
+			end
 		end
 	end
 
