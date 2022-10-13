@@ -9,7 +9,7 @@ https://user-images.githubusercontent.com/102876811/195559738-2508d4b0-c33e-44ad
 ```lua
 local nm = require("neo-minimap")
 
-nm.set("keymap", "language", {
+nm.set("keymap", "filetype", { -- `:set filetype?` if you don't know your desired filetype
 	query = [[
 ;; query
 ((query_goes_here) @cap)
