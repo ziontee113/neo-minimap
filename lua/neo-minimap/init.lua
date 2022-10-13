@@ -99,6 +99,13 @@ local function __mappings_handling(buf, win, line_data, opts)
 	vim.keymap.set("n", "<Esc>", ":q!<cr>", { buffer = buf })
 	vim.keymap.set("n", "t", ":TSBufToggle highlight<cr>", { buffer = buf })
 	vim.keymap.set("n", "h", ":TSBufToggle highlight<cr>", { buffer = buf })
+	vim.keymap.set("n", "c", function()
+		if vim.wo.conceallevel > 0 then
+			vim.wo.conceallevel = 0
+		else
+			vim.wo.conceallevel = 2
+		end
+	end, { buffer = buf, nowait = true })
 	vim.keymap.set("n", "a", function()
 		opts.auto = not opts.auto
 	end, { buffer = buf })
