@@ -25,9 +25,11 @@ nm.set("keymap", "language", {
 
 ## Example
 
+Example for Lua:
 ```lua
-local nm = require("neo-minimap")
+local nm = require("neo-minimap") -- for shorthand use later
 
+-- Lua
 nm.set("zi", "lua", { -- press `zi` to open the minimap, in `lua` files
 	query = [[
 ;; query
@@ -41,6 +43,20 @@ nm.set("zi", "lua", { -- press `zi` to open the minimap, in `lua` files
 		{ "keymap", "<A-j>", true }, -- jump to the next 'keymap' (Vim pattern)
 		{ "keymap", "<A-k>", false }, -- jump to the previous 'keymap' (Vim pattern)
 	},
+})
+```
+
+```lua
+local nm = require("neo-minimap") -- for shorthand use later
+
+-- TSX
+nm.set("zi", "typescriptreact", {  -- press `zi` to open the minimap, in `typescriptreact` files
+	query = [[
+;; query
+((function_declaration) @cap) ;; matches function declarations
+((arrow_function) @cap) ;; matches arrow functions
+((identifier) @cap (#vim-match? @cap "^use.*")) ;; matches hooks (useState, useEffect, use***, etc...)
+  ]],
 })
 ```
 
