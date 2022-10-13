@@ -2,6 +2,8 @@
 
 Plugin for Neovim that lets you create your own *"minimap"* from *Treesitter Queries*.
 
+https://user-images.githubusercontent.com/102876811/195559738-2508d4b0-c33e-44ad-a617-fa785e1c7a57.mp4
+
 ## Syntax
 
 ```lua
@@ -59,6 +61,10 @@ nm.set("zi", "typescriptreact", {  -- press `zi` to open the minimap, in `typesc
   ]],
 })
 ```
+
+https://user-images.githubusercontent.com/102876811/195559769-0373bc88-9cba-4731-a7d2-7ec5c461b569.mp4
+
+
 
 ## Minimap Specific Mappings
 
