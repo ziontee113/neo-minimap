@@ -80,7 +80,7 @@ end
 
 local defaults = {
 	hl_group = "DiagnosticWarn",
-	auto = true,
+	auto_jump = true,
 }
 
 local function jump_and_zz(line_data)
@@ -107,7 +107,7 @@ local function __mappings_handling(buf, win, line_data, opts)
 		end
 	end, { buffer = buf, nowait = true })
 	vim.keymap.set("n", "a", function()
-		opts.auto = not opts.auto
+		opts.auto_jump = not opts.auto_jump
 	end, { buffer = buf })
 	vim.keymap.set("n", "l", function()
 		jump_and_zz(line_data)
@@ -190,7 +190,7 @@ M.browse = function(opts)
 		buffer = buf,
 		group = group,
 		callback = function()
-			if opts.auto then
+			if opts.auto_jump then
 				jump_and_zz(line_data)
 			end
 		end,

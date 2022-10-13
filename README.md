@@ -16,6 +16,10 @@ nm.set("keymap", "language", {
 		{ "/search", "search_mapping", true }, -- true means search forward
 		{ "/search", "search_mapping", false }, -- false means search backwards
 	},
+
+
+	hl_group = "my_hl_group", -- optional, defaults to "DiagnosticWarn"
+	auto_jump = true, -- optional, defaults to `true`, auto jump when move cursor
 })
 ```
 
