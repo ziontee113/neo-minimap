@@ -203,7 +203,8 @@ M.browse = function(opts)
 	local winWidth = opts.width
 	local winHeight = opts.height
 
-	local win = vim.api.nvim_open_win(buf, true, {
+	-- nvim_open_win section
+	local open_win_opts = {
 		relative = "editor",
 		width = winWidth,
 		col = math.ceil((width - winWidth) / 2),
@@ -211,13 +212,34 @@ M.browse = function(opts)
 		style = "minimal",
 		height = winHeight,
 		border = "single",
-	})
+	}
 
-	vim.api.nvim_win_set_option(win, "winhl", "Normal:")
-	vim.api.nvim_win_set_option(win, "scrolloff", 2)
-	vim.api.nvim_win_set_option(win, "conceallevel", 0)
-	vim.api.nvim_win_set_option(win, "concealcursor", "n")
-	vim.api.nvim_win_set_option(win, "cursorline", true)
+	if opts.open_win_opts then
+		for key, value in pairs(opts.open_win_opts) do
+			open_win_opts[key] = value
+		end
+	end
+
+	local win = vim.api.nvim_open_win(buf, true, open_win_opts)
+
+	-- win_set_option section
+	local win_opts = {
+		winhl = "Normal:",
+		scrolloff = 2,
+		conceallevel = 0,
+		concealcursor = "n",
+		cursorline = true,
+	}
+
+	if opts.win_opts then
+		for key, value in pairs(opts.win_opts) do
+			win_opts[key] = value
+		end
+	end
+
+	for key, value in pairs(win_opts) do
+		vim.api.nvim_win_set_option(win, key, value)
+	end
 
 	local setTextLines = {}
 	for _, line in ipairs(line_data.lines) do

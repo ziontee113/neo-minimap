@@ -28,6 +28,9 @@ nm.set("keymap", "filetype", { -- `:set filetype?` if you don't know your desire
 	height = 12, -- optional, defaults to 12, height of the minimap
 	hl_group = "my_hl_group", -- optional, defaults to "DiagnosticWarn"
 	auto_jump = true, -- optional, defaults to `true`, auto jump when move cursor
+
+    open_win_opts = {}, -- optional, for setting `nvim_open_win` options
+    win_opts = {}, -- optional, for setting `nvim_win_set_option` options
 })
 ```
 
