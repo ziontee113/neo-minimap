@@ -14,12 +14,13 @@ nm.set("keymap", "filetype", { -- `:set filetype?` if you don't know your desire
 ;; query
 ((query_goes_here) @cap)
   ]],
-	search_patterns = {
+
+	search_patterns = { -- optional
 		{ "/search", "search_mapping", true }, -- true means search forward
 		{ "/search", "search_mapping", false }, -- false means search backwards
 	},
-
-
+	width = 44, -- optional, defaults to 44, width of the minimap
+	height = 12, -- optional, defaults to 12, height of the minimap
 	hl_group = "my_hl_group", -- optional, defaults to "DiagnosticWarn"
 	auto_jump = true, -- optional, defaults to `true`, auto jump when move cursor
 })
@@ -101,6 +102,8 @@ vim.keymap.set("n", "your_keymap", function()
             { "function", "<C-j>", true },
             { "function", "<C-k>", false },
         },
+        width = 44,
+        height = 12,
     })
 end)
 ```

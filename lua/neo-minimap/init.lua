@@ -86,6 +86,8 @@ end
 local defaults = {
 	hl_group = "DiagnosticWarn",
 	auto_jump = true,
+	width = 44,
+	height = 12,
 }
 
 local function jump_and_zz(line_data)
@@ -166,8 +168,8 @@ M.browse = function(opts)
 	local stats = vim.api.nvim_list_uis()[1]
 	local width = stats.width
 	local height = stats.height
-	local winWidth = 44
-	local winHeight = 12
+	local winWidth = opts.width
+	local winHeight = opts.height
 
 	local win = vim.api.nvim_open_win(buf, true, {
 		relative = "editor",
