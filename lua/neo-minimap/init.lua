@@ -97,7 +97,7 @@ local function __buffer_query_processor(opts)
 					if not duplications_hashmap_check[row] then
 						table.insert(return_tbl.lines, {
 							text = string.rep(" ", #tostring(row)) .. "\t" .. line,
-							lnum = row,
+							lnum = row - 1,
 							lcol = 0,
 						})
 						duplications_hashmap_check[row] = true

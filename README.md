@@ -1,6 +1,6 @@
 ## Neo-Minimap
 
-Plugin for Neovim that lets you create your own *"minimap"* from *Treesitter Queries*.
+Plugin for Neovim that lets you create your own *"minimap"* from *Treesitter Queries* or *Vim Regex*.
 
 https://user-images.githubusercontent.com/102876811/195559738-2508d4b0-c33e-44ad-a617-fa785e1c7a57.mp4
 
@@ -15,7 +15,10 @@ nm.set("keymap", "filetype", { -- `:set filetype?` if you don't know your desire
 ((query_goes_here) @cap)
   ]],
 
-    regex = { "vim_regex_goes_here" }, -- vim regex option, for when you can't or don't want to use Treesitter Queries
+    regex = { 
+        "vim_regex_goes_here",
+        [[another_vim_regex]],
+    }, -- vim regex option, for when you can't or don't want to use Treesitter Queries
 
 	search_patterns = { -- optional
 		{ "/search", "search_mapping", true }, -- true means search forward
