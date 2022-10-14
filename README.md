@@ -113,3 +113,14 @@ vim.keymap.set("n", "your_keymap", function()
     })
 end)
 ```
+
+## Custom Events
+
+Example:
+
+```lua
+nm.set("zo", "*/snippets/*.lua", { -- "mapping", "pattern"
+	regex = { [[--.*\w]] },
+	events = { "BufEnter" }, -- events
+})
+```

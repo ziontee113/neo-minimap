@@ -242,7 +242,12 @@ end
 
 local augroup = vim.api.nvim_create_augroup("BufferBrowser", {})
 M.set = function(keymap, pattern, opts)
-	vim.api.nvim_create_autocmd({ "FileType" }, {
+	local events = { "FileType" }
+	if opts.events then
+		events = opts.events
+	end
+
+	vim.api.nvim_create_autocmd(events, {
 		pattern = pattern,
 		group = augroup,
 		callback = function()
