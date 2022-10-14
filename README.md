@@ -74,3 +74,33 @@ https://user-images.githubusercontent.com/102876811/195559769-0373bc88-9cba-4731
 
 - `l` - jump to location (for when `auto_jump` is `false`), doesn't close Minimap.
 - `Enter` - jump to location, closes Minimap.
+
+## The `.browse()` method
+
+You can also use `nm.browse()` method if you want more control over how you define your keymaps.
+
+Syntax:
+
+```lua
+nm.browse(opts)
+```
+
+Example:
+
+```lua
+local nm = require("neo-minimap")
+
+vim.keymap.set("n", "your_keymap", function()
+    nm.browse({
+        query = [[
+    ;; query
+    ((for_statement) @cap)
+    ((function_declaration) @cap)
+      ]],
+        search_patterns = {
+            { "function", "<C-j>", true },
+            { "function", "<C-k>", false },
+        },
+    })
+end)
+```
