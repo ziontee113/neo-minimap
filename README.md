@@ -15,6 +15,8 @@ nm.set("keymap", "filetype", { -- `:set filetype?` if you don't know your desire
 ((query_goes_here) @cap)
   ]],
 
+    regex = { "vim_regex_goes_here" }, -- vim regex option, for when you can't or don't want to use Treesitter Queries
+
 	search_patterns = { -- optional
 		{ "/search", "search_mapping", true }, -- true means search forward
 		{ "/search", "search_mapping", false }, -- false means search backwards
@@ -40,6 +42,7 @@ nm.set("zi", "lua", { -- press `zi` to open the minimap, in `lua` files
 ((function_call (dot_index_expression) @field (#eq? @field "vim.keymap.set")) @cap) ;; matches vim.keymap.set
 ((function_declaration) @cap) ;; matches function declarations
   ]],
+	regex = { [[\.insert]] }, -- 1 vim regex, matches lines with `.insert` pattern
 	search_patterns = {
 		{ "function", "<C-j>", true }, -- jump to the next 'function' (Vim pattern)
 		{ "function", "<C-k>", false }, -- jump to the previous 'function' (Vim pattern)
