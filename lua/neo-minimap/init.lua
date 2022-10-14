@@ -2,15 +2,20 @@ local M = {}
 
 -- TODO: Add hot query swapping / filtering functionality
 -- TODO: Add current cursor position when initiate Window Maker
--- TODO: Handle duplications
 
 -- local ts_utils = require("nvim-treesitter.ts_utils")
 local ns = vim.api.nvim_create_namespace("buffer-brower-ns")
 
-local function __set_lnum_extmarks(buf, lnumLines, opts)
+local function __set_lnum_extmarks(buf, lines, opts)
+	local lnumLines = {}
+	for _, line in ipairs(lines) do
+		table.insert(lnumLines, line.lnum)
+	end
+
 	local line_max = tonumber(#tostring(lnumLines[#lnumLines]))
 
-	for i, lnum in ipairs(lnumLines) do
+	for i, line in ipairs(lines.lines) do
+		local lnum = line.lnum
 		local str = tostring(lnum + 1)
 		str = string.rep(" ", line_max - #str) .. str
 
@@ -22,14 +27,14 @@ local function __set_lnum_extmarks(buf, lnumLines, opts)
 end
 
 local function __buffer_query_processor(opts)
+	local duplications_hashmap_check = {}
 	local return_tbl = {
-		textLines = {},
-		lnumLines = {},
-		lcolLines = {},
+		lines = {},
 		oldBuf = vim.api.nvim_get_current_buf(),
 		oldWin = vim.api.nvim_get_current_win(),
 	}
 
+	-- Treesitter Query Results Handling
 	local ts = vim.treesitter
 	local current_buffer = vim.api.nvim_get_current_buf()
 
@@ -64,21 +69,48 @@ local function __buffer_query_processor(opts)
 	local trees = parser:parse()
 	local root = trees[1]:root()
 
-	local ok, iter_query = pcall(vim.treesitter.query.parse_query, opts.filetype, opts.query)
+	local ok, iter_query = pcall(vim.treesitter.query.parse_query, opts.filetype, opts.query or "")
 	if ok then
-		local duplications_hashmap_check = {}
 		for _, matches, _ in iter_query:iter_matches(root, 0) do
 			local row, col = matches[1]:range()
 
 			if not duplications_hashmap_check[row] then
 				local line_text = vim.api.nvim_buf_get_lines(0, row, row + 1, false)[1]
-				table.insert(return_tbl.textLines, string.rep(" ", #tostring(row)) .. "\t" .. line_text)
-				table.insert(return_tbl.lnumLines, row)
-				table.insert(return_tbl.lcolLines, col)
+				table.insert(return_tbl.lines, {
+					text = string.rep(" ", #tostring(row)) .. "\t" .. line_text,
+					lnum = row,
+					lcol = col,
+				})
 				duplications_hashmap_check[row] = true
 			end
 		end
 	end
+
+	-- Vim Regex Results Handling
+	if opts.regex then
+		for _, pattern in ipairs(opts.regex) do
+			local regex = vim.regex(pattern)
+			local buf_lines = vim.api.nvim_buf_get_lines(return_tbl.oldBuf, 0, -1, false)
+
+			for row, line in ipairs(buf_lines) do
+				if regex:match_str(line) then
+					if not duplications_hashmap_check[row] then
+						table.insert(return_tbl.lines, {
+							text = string.rep(" ", #tostring(row)) .. "\t" .. line,
+							lnum = row,
+							lcol = 0,
+						})
+						duplications_hashmap_check[row] = true
+					end
+				end
+			end
+		end
+	end
+
+	-- Sort return_tbl according to lnumLines
+	table.sort(return_tbl.lines, function(a, b)
+		return a.lnum < b.lnum
+	end)
 
 	return return_tbl
 end
@@ -92,7 +124,7 @@ local defaults = {
 
 local function jump_and_zz(line_data)
 	local curLine = vim.api.nvim_win_get_cursor(0)[1]
-	vim.api.nvim_win_set_cursor(line_data.oldWin, { line_data.lnumLines[curLine] + 1, line_data.lcolLines[curLine] })
+	vim.api.nvim_win_set_cursor(line_data.oldWin, { line_data.lines[curLine].lnum + 1, line_data.lines[curLine].lcol })
 
 	vim.api.nvim_win_call(line_data.oldWin, function()
 		vim.cmd([[normal! zz]])
@@ -150,7 +182,7 @@ end
 
 M.browse = function(opts)
 	local line_data = __buffer_query_processor(opts)
-	if #line_data.lnumLines == 0 then
+	if #line_data.lines == 0 then
 		print("0 targets for buffer-browser")
 		return
 	end
@@ -187,9 +219,13 @@ M.browse = function(opts)
 	vim.api.nvim_win_set_option(win, "concealcursor", "n")
 	vim.api.nvim_win_set_option(win, "cursorline", true)
 
-	vim.api.nvim_buf_set_lines(buf, 0, -1, false, line_data.textLines or {})
+	local setTextLines = {}
+	for _, line in ipairs(line_data.lines) do
+		table.insert(setTextLines, line.text)
+	end
+	vim.api.nvim_buf_set_lines(buf, 0, -1, false, setTextLines or {})
 
-	__set_lnum_extmarks(buf, line_data.lnumLines, opts)
+	__set_lnum_extmarks(buf, line_data, opts)
 	__mappings_handling(buf, win, line_data, opts)
 
 	local group = vim.api.nvim_create_augroup("Augroup Name", { clear = true })
