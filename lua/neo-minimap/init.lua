@@ -1,4 +1,6 @@
 local M = {}
+local oldBuf, oldWin
+local oldContentBuf, oldContentWin
 
 -- TODO: Add hot query swapping / filtering functionality
 -- TODO: Add current cursor position when initiate Window Maker
@@ -7,6 +9,8 @@ local M = {}
 local ns = vim.api.nvim_create_namespace("buffer-brower-ns")
 
 local function __set_lnum_extmarks(buf, lines, opts)
+	vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
+
 	local lnumLines = {}
 	for _, line in ipairs(lines) do
 		table.insert(lnumLines, line.lnum)
@@ -36,7 +40,17 @@ local function __buffer_query_processor(opts)
 
 	-- Treesitter Query Results Handling
 	local ts = vim.treesitter
-	local current_buffer = vim.api.nvim_get_current_buf()
+	local current_buffer
+
+	if not opts.hotswap then
+		current_buffer = return_tbl.oldBuf
+		oldContentBuf = current_buffer
+		oldContentWin = return_tbl.oldWin
+	else
+		current_buffer = oldContentBuf
+		return_tbl.oldBuf = oldContentBuf
+		return_tbl.oldWin = oldContentWin
+	end
 
 	local filetype_to_parsername = {
 		arduino = "cpp",
@@ -59,23 +73,23 @@ local function __buffer_query_processor(opts)
 	}
 
 	opts.filetype = vim.bo[current_buffer].ft
-	local ok, parser = pcall(ts.get_parser, 0)
+	local ok, parser = pcall(ts.get_parser, current_buffer)
 	if not ok then
 		local cur_buf_filetype = vim.bo[current_buffer].ft
-		parser = ts.get_parser(0, filetype_to_parsername[cur_buf_filetype])
+		parser = ts.get_parser(current_buffer, filetype_to_parsername[cur_buf_filetype])
 		opts.filetype = filetype_to_parsername[cur_buf_filetype]
 	end
 
 	local trees = parser:parse()
 	local root = trees[1]:root()
 
-	local ok, iter_query = pcall(vim.treesitter.query.parse_query, opts.filetype, opts.query or "")
+	local ok, iter_query = pcall(vim.treesitter.query.parse_query, opts.filetype, opts.query[opts.query_index] or "")
 	if ok then
-		for _, matches, _ in iter_query:iter_matches(root, 0) do
+		for _, matches, _ in iter_query:iter_matches(root, current_buffer) do
 			local row, col = matches[1]:range()
 
 			if not duplications_hashmap_check[row] then
-				local line_text = vim.api.nvim_buf_get_lines(0, row, row + 1, false)[1]
+				local line_text = vim.api.nvim_buf_get_lines(current_buffer, row, row + 1, false)[1]
 				table.insert(return_tbl.lines, {
 					text = string.rep(" ", #tostring(row)) .. "\t" .. line_text,
 					lnum = row,
@@ -88,19 +102,21 @@ local function __buffer_query_processor(opts)
 
 	-- Vim Regex Results Handling
 	if opts.regex then
-		for _, pattern in ipairs(opts.regex) do
-			local regex = vim.regex(pattern)
-			local buf_lines = vim.api.nvim_buf_get_lines(return_tbl.oldBuf, 0, -1, false)
+		if opts.regex[opts.query_index] then
+			for _, pattern in ipairs(opts.regex[opts.query_index]) do
+				local regex = vim.regex(pattern)
+				local buf_lines = vim.api.nvim_buf_get_lines(return_tbl.oldBuf, 0, -1, false)
 
-			for row, line in ipairs(buf_lines) do
-				if regex:match_str(line) then
-					if not duplications_hashmap_check[row] then
-						table.insert(return_tbl.lines, {
-							text = string.rep(" ", #tostring(row)) .. "\t" .. line,
-							lnum = row - 1,
-							lcol = 0,
-						})
-						duplications_hashmap_check[row] = true
+				for row, line in ipairs(buf_lines) do
+					if regex:match_str(line) then
+						if not duplications_hashmap_check[row] then
+							table.insert(return_tbl.lines, {
+								text = string.rep(" ", #tostring(row)) .. "\t" .. line,
+								lnum = row - 1,
+								lcol = 0,
+							})
+							duplications_hashmap_check[row] = true
+						end
 					end
 				end
 			end
@@ -120,6 +136,7 @@ local defaults = {
 	auto_jump = true,
 	width = 44,
 	height = 12,
+	query_index = 1,
 }
 
 local function jump_and_zz(line_data)
@@ -158,6 +175,24 @@ local function __mappings_handling(buf, win, line_data, opts)
 		vim.fn.win_gotoid(line_data.oldWin)
 	end, { buffer = buf })
 
+	-- Hot swap mapping
+	vim.keymap.set("n", "o", function()
+		opts.hotswap = true
+		opts.query_index = opts.query_index + 1
+		if opts.query_index > #opts.query then
+			opts.query_index = 1
+		end
+		M.browse(opts)
+	end, { buffer = buf })
+	vim.keymap.set("n", "i", function()
+		opts.hotswap = true
+		opts.query_index = opts.query_index - 1
+		if opts.query_index < 1 then
+			opts.query_index = #opts.query
+		end
+		M.browse(opts)
+	end, { buffer = buf })
+
 	if opts.search_patterns then
 		for _, v in ipairs(opts.search_patterns) do
 			local pattern, keymap, forward = unpack(v)
@@ -181,10 +216,13 @@ local function __mappings_handling(buf, win, line_data, opts)
 end
 
 M.browse = function(opts)
-	local line_data = __buffer_query_processor(opts)
-	if #line_data.lines == 0 then
-		print("0 targets for buffer-browser")
-		return
+	if type(opts.query) == "string" then
+		opts.query = { opts.query }
+	end
+	for i, value in ipairs(opts.regex) do
+		if type(value) == "string" then
+			opts.regex[i] = { opts.regex[i] }
+		end
 	end
 
 	for k, v in pairs(defaults) do
@@ -193,52 +231,71 @@ M.browse = function(opts)
 		end
 	end
 
-	local buf = vim.api.nvim_create_buf(false, true)
-	vim.api.nvim_buf_set_option(buf, "filetype", opts.filetype) -- WARN: this opts.filetype got mutated in __buffer_query_processor()
-	vim.api.nvim_buf_set_option(buf, "bufhidden", "delete")
-
-	local stats = vim.api.nvim_list_uis()[1]
-	local width = stats.width
-	local height = stats.height
-	local winWidth = opts.width
-	local winHeight = opts.height
-
-	-- nvim_open_win section
-	local open_win_opts = {
-		relative = "editor",
-		width = winWidth,
-		col = math.ceil((width - winWidth) / 2),
-		row = math.ceil((height - winHeight) / 2) - 1,
-		style = "minimal",
-		height = winHeight,
-		border = "single",
-	}
-
-	if opts.open_win_opts then
-		for key, value in pairs(opts.open_win_opts) do
-			open_win_opts[key] = value
-		end
+	local line_data = __buffer_query_processor(opts)
+	if #line_data.lines == 0 then
+		print("0 targets for buffer-browser")
+		return
 	end
 
-	local win = vim.api.nvim_open_win(buf, true, open_win_opts)
+	local buf, win
 
-	-- win_set_option section
-	local win_opts = {
-		winhl = "Normal:",
-		scrolloff = 2,
-		conceallevel = 0,
-		concealcursor = "n",
-		cursorline = true,
-	}
-
-	if opts.win_opts then
-		for key, value in pairs(opts.win_opts) do
-			win_opts[key] = value
-		end
+	if opts.hotswap then
+		buf = oldBuf
+		win = oldWin
 	end
 
-	for key, value in pairs(win_opts) do
-		vim.api.nvim_win_set_option(win, key, value)
+	if not opts.hotswap then
+		-- Buffer opts section
+		buf = vim.api.nvim_create_buf(false, true)
+		vim.api.nvim_buf_set_option(buf, "filetype", opts.filetype) -- WARN: this opts.filetype got mutated in __buffer_query_processor()
+		vim.api.nvim_buf_set_option(buf, "bufhidden", "delete")
+
+		local stats = vim.api.nvim_list_uis()[1]
+		local width = stats.width
+		local height = stats.height
+		local winWidth = opts.width
+		local winHeight = opts.height
+
+		-- nvim_open_win section
+		local open_win_opts = {
+			relative = "editor",
+			width = winWidth,
+			col = math.ceil((width - winWidth) / 2),
+			row = math.ceil((height - winHeight) / 2) - 1,
+			style = "minimal",
+			height = winHeight,
+			border = "single",
+		}
+
+		if opts.open_win_opts then
+			for key, value in pairs(opts.open_win_opts) do
+				open_win_opts[key] = value
+			end
+		end
+
+		win = vim.api.nvim_open_win(buf, true, open_win_opts)
+
+		-- win_set_option section
+		local win_opts = {
+			winhl = "Normal:",
+			scrolloff = 2,
+			conceallevel = 0,
+			concealcursor = "n",
+			cursorline = true,
+		}
+
+		if opts.win_opts then
+			for key, value in pairs(opts.win_opts) do
+				win_opts[key] = value
+			end
+		end
+
+		for key, value in pairs(win_opts) do
+			vim.api.nvim_win_set_option(win, key, value)
+		end
+
+		oldBuf = buf
+		oldWin = win
 	end
 
 	local setTextLines = {}
@@ -246,6 +303,7 @@ M.browse = function(opts)
 		table.insert(setTextLines, line.text)
 	end
 	vim.api.nvim_buf_set_lines(buf, 0, -1, false, setTextLines or {})
+	vim.api.nvim_win_set_cursor(win, { 1, 0 })
 
 	__set_lnum_extmarks(buf, line_data, opts)
 	__mappings_handling(buf, win, line_data, opts)
@@ -274,6 +332,8 @@ M.set = function(keymap, pattern, opts)
 		group = augroup,
 		callback = function()
 			vim.keymap.set("n", keymap, function()
+				opts.hotswap = nil
+				opts.query_index = 1
 				M.browse(opts)
 			end, { buffer = 0 })
 		end,
