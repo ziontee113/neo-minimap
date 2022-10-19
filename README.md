@@ -71,6 +71,8 @@ nm.set({"keymap1", "keymap2"}, { "*.your_file_extension", "your_autocmd_pattern"
 })
 ```
 
+[Here's the config I use myself](https://github.com/ziontee113/ziontee113-neovim-config/blob/master/lua/plugins/neo-minimap/init.lua)
+
 ## Minimap Specific Mappings
 
 - `a` - Toggle `auto_jump`
