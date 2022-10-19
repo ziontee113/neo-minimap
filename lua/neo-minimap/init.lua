@@ -136,6 +136,7 @@ local defaults = {
 	auto_jump = true,
 	width = 44,
 	height = 12,
+	height_toggle_index = 1,
 	query_index = 1,
 }
 
@@ -198,6 +199,23 @@ local function __mappings_handling(buf, win, line_data, opts)
 			opts.query_index = #opts.query
 		end
 		M.browse(opts)
+	end, { buffer = buf })
+
+	vim.keymap.set("n", "<C-h>", function()
+		-- set height
+		opts.height_toggle_index = opts.height_toggle_index + 1
+		if opts.height_toggle_index > #opts.height_toggle then
+			opts.height_toggle_index = 1
+		end
+		vim.api.nvim_win_set_height(0, opts.height_toggle[opts.height_toggle_index])
+
+		-- set pos
+		local stats = vim.api.nvim_list_uis()[1]
+		vim.api.nvim_win_set_config(0, {
+			relative = "editor",
+			row = math.ceil((stats.height - opts.height_toggle[opts.height_toggle_index]) / 2),
+			col = opts.open_win_opts.col,
+		})
 	end, { buffer = buf })
 
 	if opts.search_patterns then
@@ -301,6 +319,7 @@ M.browse = function(opts)
 			end
 		end
 
+		opts.open_win_opts = open_win_opts
 		win = vim.api.nvim_open_win(buf, true, open_win_opts)
 
 		-- win_set_option section
