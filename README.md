@@ -4,6 +4,12 @@ Plugin for Neovim that lets you create your own *"minimap"* from *Treesitter Que
 
 https://user-images.githubusercontent.com/102876811/195559738-2508d4b0-c33e-44ad-a617-fa785e1c7a57.mp4
 
+## Overview & Setup Guide
+
+[![neominimap](https://user-images.githubusercontent.com/102876811/196762594-8eadeef9-97e9-4c8c-94fb-d4071b698264.png)](https://youtu.be/vNyQBWfSh7c)
+
+You can watch Overview & Setup Guide on [Youtube](https://youtu.be/vNyQBWfSh7c)
+
 ## New Syntax
 
 ```lua
