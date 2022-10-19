@@ -216,27 +216,44 @@ local function __mappings_handling(buf, win, line_data, opts)
 end
 
 M.browse = function(opts)
+	-- Queries handling
 	if type(opts.query) == "string" then
 		opts.query = { opts.query }
 	end
+	for i, _ in ipairs(opts.query) do
+		if type(opts.query[i]) == "number" then
+			if opts.query[opts.query[i]] then
+				opts.query[i] = opts.query[opts.query[i]]
+			end
+		end
+	end
+	-- Regex handling
 	for i, value in ipairs(opts.regex) do
 		if type(value) == "string" then
 			opts.regex[i] = { opts.regex[i] }
 		end
 	end
+	for i, regex_group in ipairs(opts.regex) do
+		if type(regex_group) == "number" then
+			opts.regex[i] = opts.regex[regex_group]
+		end
+	end
 
+	-- Default options handling
 	for k, v in pairs(defaults) do
 		if opts[k] == nil then
 			opts[k] = v
 		end
 	end
 
+	-- Get Line Data
 	local line_data = __buffer_query_processor(opts)
 	if #line_data.lines == 0 then
 		print("0 targets for buffer-browser")
 		return
 	end
 
+	-- Buf & Win Handling
 	local buf, win
 
 	if opts.hotswap then
@@ -298,6 +315,7 @@ M.browse = function(opts)
 		oldWin = win
 	end
 
+	-- Set Minimap Lines
 	local setTextLines = {}
 	for _, line in ipairs(line_data.lines) do
 		table.insert(setTextLines, line.text)
@@ -308,7 +326,8 @@ M.browse = function(opts)
 	__set_lnum_extmarks(buf, line_data, opts)
 	__mappings_handling(buf, win, line_data, opts)
 
-	local group = vim.api.nvim_create_augroup("Augroup Name", { clear = true })
+	-- Cursor Move handling
+	local group = vim.api.nvim_create_augroup("Neo-Minimap-CursorMoved", { clear = true })
 	vim.api.nvim_create_autocmd("CursorMoved", {
 		buffer = buf,
 		group = group,
@@ -320,7 +339,7 @@ M.browse = function(opts)
 	})
 end
 
-local augroup = vim.api.nvim_create_augroup("BufferBrowser", {})
+local augroup = vim.api.nvim_create_augroup("Neo-Minimap", {})
 M.set = function(keymap, pattern, opts)
 	local events = { "FileType" }
 	if opts.events then
