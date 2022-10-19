@@ -139,7 +139,7 @@ local defaults = {
 	query_index = 1,
 }
 
-local function jump_and_zz(line_data)
+local function jump_and_zz(line_data, opts)
 	if move_start_init then
 		local curLine = vim.api.nvim_win_get_cursor(0)[1]
 		vim.api.nvim_win_set_cursor(
@@ -150,6 +150,8 @@ local function jump_and_zz(line_data)
 		vim.api.nvim_win_call(line_data.oldWin, function()
 			vim.cmd([[normal! zz]])
 		end)
+
+		opts.current_cursor_line_pos = line_data.lines[curLine].lnum + 1
 	else
 		move_start_init = true
 	end
@@ -173,13 +175,13 @@ local function __mappings_handling(buf, win, line_data, opts)
 		opts.auto_jump = not opts.auto_jump
 	end, { buffer = buf })
 	vim.keymap.set("n", "l", function()
-		jump_and_zz(line_data)
+		jump_and_zz(line_data, opts)
 		if opts.auto_jump then
 			vim.api.nvim_win_close(win, true)
 		end
 	end, { buffer = buf })
 	vim.keymap.set("n", "<CR>", function()
-		jump_and_zz(line_data)
+		jump_and_zz(line_data, opts)
 		vim.api.nvim_win_close(win, true)
 
 		vim.fn.win_gotoid(line_data.oldWin)
@@ -378,7 +380,7 @@ M.browse = function(opts)
 		group = group,
 		callback = function()
 			if opts.auto_jump then
-				jump_and_zz(line_data)
+				jump_and_zz(line_data, opts)
 			end
 		end,
 	})
