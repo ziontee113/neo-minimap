@@ -433,6 +433,7 @@ M.source_on_save = function(path)
 		pattern = path .. "*",
 		group = augroup,
 		callback = function()
+			M.clear_all()
 			vim.cmd(":so")
 		end,
 	})
