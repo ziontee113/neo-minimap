@@ -175,6 +175,9 @@ local function __mappings_handling(buf, win, line_data, opts)
 	end, { buffer = buf })
 	vim.keymap.set("n", "l", function()
 		jump_and_zz(line_data)
+		if opts.auto_jump then
+			vim.api.nvim_win_close(win, true)
+		end
 	end, { buffer = buf })
 	vim.keymap.set("n", "<CR>", function()
 		jump_and_zz(line_data)
@@ -202,20 +205,22 @@ local function __mappings_handling(buf, win, line_data, opts)
 	end, { buffer = buf })
 
 	vim.keymap.set("n", "<C-h>", function()
-		-- set height
-		opts.height_toggle_index = opts.height_toggle_index + 1
-		if opts.height_toggle_index > #opts.height_toggle then
-			opts.height_toggle_index = 1
-		end
-		vim.api.nvim_win_set_height(0, opts.height_toggle[opts.height_toggle_index])
+		if opts.height_toggle then
+			-- set height
+			opts.height_toggle_index = opts.height_toggle_index + 1
+			if opts.height_toggle_index > #opts.height_toggle then
+				opts.height_toggle_index = 1
+			end
+			vim.api.nvim_win_set_height(0, opts.height_toggle[opts.height_toggle_index])
 
-		-- set pos
-		local stats = vim.api.nvim_list_uis()[1]
-		vim.api.nvim_win_set_config(0, {
-			relative = "editor",
-			row = math.ceil((stats.height - opts.height_toggle[opts.height_toggle_index]) / 2),
-			col = opts.open_win_opts.col,
-		})
+			-- set pos
+			local stats = vim.api.nvim_list_uis()[1]
+			vim.api.nvim_win_set_config(0, {
+				relative = "editor",
+				row = math.ceil((stats.height - opts.height_toggle[opts.height_toggle_index]) / 2),
+				col = opts.open_win_opts.col,
+			})
+		end
 	end, { buffer = buf })
 
 	if opts.search_patterns then
