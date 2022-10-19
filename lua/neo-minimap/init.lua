@@ -1,4 +1,6 @@
 local M = {}
+local autocmd_list = {}
+
 local oldBuf, oldWin
 local oldContentBuf, oldContentWin
 
@@ -217,25 +219,29 @@ end
 
 M.browse = function(opts)
 	-- Queries handling
-	if type(opts.query) == "string" then
-		opts.query = { opts.query }
-	end
-	for i, _ in ipairs(opts.query) do
-		if type(opts.query[i]) == "number" then
-			if opts.query[opts.query[i]] then
-				opts.query[i] = opts.query[opts.query[i]]
+	if opts.query then
+		if type(opts.query) == "string" then
+			opts.query = { opts.query }
+		end
+		for i, _ in ipairs(opts.query) do
+			if type(opts.query[i]) == "number" then
+				if opts.query[opts.query[i]] then
+					opts.query[i] = opts.query[opts.query[i]]
+				end
 			end
 		end
 	end
-	-- Regex handling
-	for i, value in ipairs(opts.regex) do
-		if type(value) == "string" then
-			opts.regex[i] = { opts.regex[i] }
+	if opts.regex then
+		-- Regex handling
+		for i, value in ipairs(opts.regex) do
+			if type(value) == "string" then
+				opts.regex[i] = { opts.regex[i] }
+			end
 		end
-	end
-	for i, regex_group in ipairs(opts.regex) do
-		if type(regex_group) == "number" then
-			opts.regex[i] = opts.regex[regex_group]
+		for i, regex_group in ipairs(opts.regex) do
+			if type(regex_group) == "number" then
+				opts.regex[i] = opts.regex[regex_group]
+			end
 		end
 	end
 
@@ -346,7 +352,7 @@ M.set = function(keymap, pattern, opts)
 		events = opts.events
 	end
 
-	vim.api.nvim_create_autocmd(events, {
+	local autocmd = vim.api.nvim_create_autocmd(events, {
 		pattern = pattern,
 		group = augroup,
 		callback = function()
@@ -355,6 +361,24 @@ M.set = function(keymap, pattern, opts)
 				opts.query_index = 1
 				M.browse(opts)
 			end, { buffer = 0 })
+		end,
+	})
+
+	table.insert(autocmd_list, autocmd)
+end
+
+M.clear_all = function()
+	for _, autocmd in ipairs(autocmd_list) do
+		vim.api.nvim_del_autocmd(autocmd)
+	end
+	autocmd_list = {}
+end
+M.source_on_save = function(path)
+	vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+		pattern = path .. "*",
+		group = augroup,
+		callback = function()
+			vim.cmd(":so")
 		end,
 	})
 end
