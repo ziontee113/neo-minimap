@@ -400,7 +400,7 @@ M.browse = function(opts)
 end
 
 local augroup = vim.api.nvim_create_augroup("Neo-Minimap", {})
-M.set = function(keymap, pattern, opts)
+M.set = function(keymaps, pattern, opts)
 	local events = { "FileType" }
 	if opts.events then
 		events = opts.events
@@ -410,12 +410,17 @@ M.set = function(keymap, pattern, opts)
 		pattern = pattern,
 		group = augroup,
 		callback = function()
-			vim.keymap.set("n", keymap, function()
-				opts.hotswap = nil
-				opts.query_index = 1
-				opts.current_cursor_line_pos = vim.api.nvim_win_get_cursor(0)[1]
-				M.browse(opts)
-			end, { buffer = 0 })
+			if type(keymaps) == "string" then
+				keymaps = { keymaps }
+			end
+			for i, value in ipairs(keymaps) do
+				vim.keymap.set("n", value, function()
+					opts.hotswap = nil
+					opts.query_index = i
+					opts.current_cursor_line_pos = vim.api.nvim_win_get_cursor(0)[1]
+					M.browse(opts)
+				end, { buffer = 0 })
+			end
 		end,
 	})
 
