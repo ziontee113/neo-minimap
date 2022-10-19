@@ -57,13 +57,13 @@ nm.set({"keymap1", "keymap2"}, { "*.your_file_extension", "your_autocmd_pattern"
     auto_jump = true, -- optional, defaults to `true`, auto jump when move cursor
 
     -- other options
-	width = 44, -- optional, defaults to 44, width of the minimap
-	height = 12, -- optional, defaults to 12, height of the minimap
-	hl_group = "my_hl_group", -- highlight group of virtual text, optional, defaults to "DiagnosticWarn"
-
+    width = 44, -- optional, defaults to 44, width of the minimap
+    height = 12, -- optional, defaults to 12, height of the minimap
+    hl_group = "my_hl_group", -- highlight group of virtual text, optional, defaults to "DiagnosticWarn"
+    
     open_win_opts = {}, -- optional, for setting custom `nvim_open_win` options
     win_opts = {}, -- optional, for setting custom `nvim_win_set_option` options
-
+    
     -- change minimap's height with <C-h>
     -- this means default minimap height is 12
     -- minimap height will change to 36 after pressing <C-h>
@@ -213,3 +213,7 @@ nm.set("zo", "*/snippets/*.lua", { -- "mapping", "pattern"
 ```
 
 </details>
+
+## Feedback
+
+If you run into issues or come up with an awesome idea, please feel free to open an issue or PR.
