@@ -6,6 +6,7 @@ local oldContentBuf, oldContentWin
 local move_start_init = false
 
 local ns = vim.api.nvim_create_namespace("neo-minimap-ns")
+local old_write_autocmd
 
 local function __set_lnum_extmarks(buf, lines, opts)
 	vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
@@ -421,7 +422,11 @@ M.clear_all = function()
 	autocmd_list = {}
 end
 M.source_on_save = function(path)
-	vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+	if old_write_autocmd then
+		vim.api.nvim_del_autocmd(old_write_autocmd)
+	end
+
+	old_write_autocmd = vim.api.nvim_create_autocmd({ "BufWritePost" }, {
 		pattern = path .. "*",
 		group = augroup,
 		callback = function()
