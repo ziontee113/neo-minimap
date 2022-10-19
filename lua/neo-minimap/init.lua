@@ -5,8 +5,7 @@ local oldBuf, oldWin
 local oldContentBuf, oldContentWin
 local move_start_init = false
 
--- local ts_utils = require("nvim-treesitter.ts_utils")
-local ns = vim.api.nvim_create_namespace("buffer-brower-ns")
+local ns = vim.api.nvim_create_namespace("neo-minimap-ns")
 
 local function __set_lnum_extmarks(buf, lines, opts)
 	vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
@@ -356,20 +355,6 @@ M.browse = function(opts)
 		table.insert(setTextLines, line.text)
 	end
 	vim.api.nvim_buf_set_lines(buf, 0, -1, false, setTextLines or {})
-
-	-- if opts.auto_jump then
-	-- 	vim.api.nvim_win_set_cursor(win, { 1, 0 })
-	-- else
-	-- 	local last_compare = math.huge
-	-- 	for i, line in ipairs(line_data.lines) do
-	-- 		if math.abs(line.lnum - opts.current_cursor_line_pos) < last_compare then
-	-- 			last_compare = math.abs(line.lnum - opts.current_cursor_line_pos)
-	-- 			vim.api.nvim_win_set_cursor(win, { i, 0 })
-	-- 		else
-	-- 			break
-	-- 		end
-	-- 	end
-	-- end
 
 	-- Set minimap to the closest possible location
 	move_start_init = false
