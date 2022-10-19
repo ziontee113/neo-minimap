@@ -3,9 +3,7 @@ local autocmd_list = {}
 
 local oldBuf, oldWin
 local oldContentBuf, oldContentWin
-
--- TODO: Add hot query swapping / filtering functionality
--- TODO: Add current cursor position when initiate Window Maker
+local move_start_init = false
 
 -- local ts_utils = require("nvim-treesitter.ts_utils")
 local ns = vim.api.nvim_create_namespace("buffer-brower-ns")
@@ -142,12 +140,19 @@ local defaults = {
 }
 
 local function jump_and_zz(line_data)
-	local curLine = vim.api.nvim_win_get_cursor(0)[1]
-	vim.api.nvim_win_set_cursor(line_data.oldWin, { line_data.lines[curLine].lnum + 1, line_data.lines[curLine].lcol })
+	if move_start_init then
+		local curLine = vim.api.nvim_win_get_cursor(0)[1]
+		vim.api.nvim_win_set_cursor(
+			line_data.oldWin,
+			{ line_data.lines[curLine].lnum + 1, line_data.lines[curLine].lcol }
+		)
 
-	vim.api.nvim_win_call(line_data.oldWin, function()
-		vim.cmd([[normal! zz]])
-	end)
+		vim.api.nvim_win_call(line_data.oldWin, function()
+			vim.cmd([[normal! zz]])
+		end)
+	else
+		move_start_init = true
+	end
 end
 
 local old_search_pattern = ""
@@ -327,7 +332,32 @@ M.browse = function(opts)
 		table.insert(setTextLines, line.text)
 	end
 	vim.api.nvim_buf_set_lines(buf, 0, -1, false, setTextLines or {})
-	vim.api.nvim_win_set_cursor(win, { 1, 0 })
+
+	-- if opts.auto_jump then
+	-- 	vim.api.nvim_win_set_cursor(win, { 1, 0 })
+	-- else
+	-- 	local last_compare = math.huge
+	-- 	for i, line in ipairs(line_data.lines) do
+	-- 		if math.abs(line.lnum - opts.current_cursor_line_pos) < last_compare then
+	-- 			last_compare = math.abs(line.lnum - opts.current_cursor_line_pos)
+	-- 			vim.api.nvim_win_set_cursor(win, { i, 0 })
+	-- 		else
+	-- 			break
+	-- 		end
+	-- 	end
+	-- end
+
+	-- Set minimap to the closest possible location
+	move_start_init = false
+	local last_compare = math.huge
+	for i, line in ipairs(line_data.lines) do
+		if math.abs(line.lnum - opts.current_cursor_line_pos) < last_compare then
+			last_compare = math.abs(line.lnum - opts.current_cursor_line_pos)
+			vim.api.nvim_win_set_cursor(win, { i, 0 })
+		else
+			break
+		end
+	end
 
 	__set_lnum_extmarks(buf, line_data, opts)
 	__mappings_handling(buf, win, line_data, opts)
@@ -359,6 +389,7 @@ M.set = function(keymap, pattern, opts)
 			vim.keymap.set("n", keymap, function()
 				opts.hotswap = nil
 				opts.query_index = 1
+				opts.current_cursor_line_pos = vim.api.nvim_win_get_cursor(0)[1]
 				M.browse(opts)
 			end, { buffer = 0 })
 		end,
