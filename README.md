@@ -21,7 +21,7 @@ nm.set({"keymap1", "keymap2"}, { "*.your_file_extension", "your_autocmd_pattern"
      -- accepts multiple treesitter queries, corresponse to each keymap,
      -- if you press "keymap1", minimap will start with first query,
      -- if you press "keymap2", minimap will start with second query,
-     -- you can have only 1 keymap but multiple queries / regexes
+     -- you can have empty query table option if you want to use regex only
     query = {
             [[
         ;; query
@@ -46,6 +46,7 @@ nm.set({"keymap1", "keymap2"}, { "*.your_file_extension", "your_autocmd_pattern"
 		{}, -- no regex
 		1, -- acts as first regex set
 	},
+    -- you can have empty regex option if you want to use Treesitter queries only
 
     -- optional
     search_patterns = {
@@ -53,7 +54,7 @@ nm.set({"keymap1", "keymap2"}, { "*.your_file_extension", "your_autocmd_pattern"
 		{ "vim_regex", "<C-k>", false }, -- jump to the previous instance of "vim_regex"
 	},
 
-	auto_jump = true, -- optional, defaults to `true`, auto jump when move cursor
+    auto_jump = true, -- optional, defaults to `true`, auto jump when move cursor
 
     -- other options
 	width = 44, -- optional, defaults to 44, width of the minimap
