@@ -411,7 +411,17 @@ end
 
 local augroup = vim.api.nvim_create_augroup("Neo-Minimap", {})
 M.set = function(keymaps, pattern, opts)
+	-- Event Handling
 	local events = { "FileType" }
+	if type(pattern) == "string" then
+		pattern = { pattern }
+	end
+	for _, p in ipairs(pattern) do
+		if string.match(p, "%*") then
+			events = { "BufEnter" }
+			break
+		end
+	end
 	if opts.events then
 		events = opts.events
 	end
