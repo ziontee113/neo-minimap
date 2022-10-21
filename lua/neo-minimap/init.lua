@@ -66,6 +66,7 @@ local function __buffer_query_processor(opts)
 		systemverilog = "verilog",
 		cls = "latex",
 		sty = "latex",
+		tex = "latex",
 		OpenFOAM = "foam",
 		pandoc = "markdown",
 		rmd = "markdown",
