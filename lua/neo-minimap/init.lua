@@ -77,12 +77,18 @@ local function __buffer_query_processor(opts)
 	local ok, parser = pcall(ts.get_parser, current_buffer)
 	if not ok then
 		local cur_buf_filetype = vim.bo[current_buffer].ft
-		parser = ts.get_parser(current_buffer, filetype_to_parsername[cur_buf_filetype])
-		opts.filetype = filetype_to_parsername[cur_buf_filetype]
+
+		ok, parser = pcall(ts.get_parser, filetype_to_parsername[cur_buf_filetype])
+		if ok then
+			opts.filetype = filetype_to_parsername[cur_buf_filetype]
+		end
 	end
 
-	local trees = parser:parse()
-	local root = trees[1]:root()
+	local root
+	if parser and type(parser) ~= "string" then
+		local trees = parser:parse()
+		root = trees[1]:root()
+	end
 
 	local ok, iter_query = pcall(vim.treesitter.query.parse_query, opts.filetype, opts.query[opts.query_index] or "")
 	if ok then
