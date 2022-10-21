@@ -87,6 +87,7 @@ nm.set({"keymap1", "keymap2"}, { "*.your_file_extension", "your_autocmd_pattern"
 - `c` - Toggle `conceallevel`
 - `q` / `Esc` - close the Minimap
 - `h` / `t` - toggle Treesitter highlighting for Minimap
+- `-` - toggle Minimap's tabstop between 2 and 4
 
 - `<C-h>` - toggle Minimap's height, depends on `height_toggle` option
 - `i` - **switch to previous query && set of regexes**

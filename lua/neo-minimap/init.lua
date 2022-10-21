@@ -194,6 +194,15 @@ local function __mappings_handling(buf, win, line_data, opts)
 		vim.fn.win_gotoid(line_data.oldWin)
 	end, { buffer = buf })
 
+	vim.keymap.set("n", "-", function()
+		local tabstop = vim.bo[buf].tabstop
+		if tabstop ~= 2 then
+			vim.api.nvim_buf_set_option(buf, "tabstop", 2)
+		else
+			vim.api.nvim_buf_set_option(buf, "tabstop", 4)
+		end
+	end, { buffer = buf })
+
 	-- Hot swap mapping
 	vim.keymap.set("n", "o", function()
 		opts.hotswap = true
