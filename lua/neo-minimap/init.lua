@@ -223,12 +223,29 @@ local function __mappings_handling(buf, win, line_data, opts)
 
 	-- will open target in vsplit
 	vim.keymap.set("n", "<C-v>", function()
-		if not opts.auto_jump then
+		if opts.auto_jump then
 			vim.api.nvim_win_call(oldWin, function()
 				jump_and_zz(line_data, opts)
 				vim.api.nvim_win_close(win, true)
 				vim.cmd(":vs")
 			end)
+		else
+			-- get current Minimap Line
+			local curMinimapLine = vim.api.nvim_win_get_cursor(0)[1]
+
+			-- move to oldContentWin, :vs
+			vim.api.nvim_set_current_win(oldContentWin)
+			vim.cmd.vs()
+
+			-- set cursor position for new vsplit, then "zz"
+			vim.api.nvim_win_set_cursor(
+				0,
+				{ line_data.lines[curMinimapLine].lnum + 1, line_data.lines[curMinimapLine].lcol }
+			)
+			vim.cmd("norm! zz")
+
+			-- close Minimap
+			vim.api.nvim_win_close(win, true)
 		end
 	end, {})
 
