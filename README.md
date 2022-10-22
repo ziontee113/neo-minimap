@@ -98,6 +98,16 @@ nm.set({"keymap1", "keymap2"}, { "*.your_file_extension", "your_autocmd_pattern"
 - `l` - jump to location, (depends on `auto_jump`), if `true` doesn't close Minimap, if `false` do.
 - `Enter` - jump to location, closes Minimap.
 
+## The setup_default() function
+
+You can call `nm.setup_default({opts})` to set up default options.
+
+```lua
+nm.setup_defaults({
+	height_toggle = { 12, 36 },
+})
+```
+
 <details>
 <summary>Old Syntax</summary>
 

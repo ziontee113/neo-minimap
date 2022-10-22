@@ -8,6 +8,23 @@ local move_start_init = false
 local ns = vim.api.nvim_create_namespace("neo-minimap-ns")
 local old_write_autocmd
 
+local user_defaults = {}
+local defaults = {
+	hl_group = "DiagnosticWarn",
+	auto_jump = true,
+	width = 44,
+	height = 12,
+	height_toggle_index = 1,
+	query_index = 1,
+}
+local default_win_opts = {
+	winhl = "Normal:",
+	scrolloff = 2,
+	conceallevel = 0,
+	concealcursor = "n",
+	cursorline = true,
+}
+
 local function __set_lnum_extmarks(buf, lines, opts)
 	vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
 
@@ -78,7 +95,7 @@ local function __buffer_query_processor(opts)
 	if not ok then
 		local cur_buf_filetype = vim.bo[current_buffer].ft
 
-		ok, parser = pcall(ts.get_parser, filetype_to_parsername[cur_buf_filetype])
+		ok, parser = pcall(ts.get_parser, current_buffer, filetype_to_parsername[cur_buf_filetype])
 		if ok then
 			opts.filetype = filetype_to_parsername[cur_buf_filetype]
 		end
@@ -143,15 +160,6 @@ local function __buffer_query_processor(opts)
 
 	return return_tbl
 end
-
-local defaults = {
-	hl_group = "DiagnosticWarn",
-	auto_jump = true,
-	width = 44,
-	height = 12,
-	height_toggle_index = 1,
-	query_index = 1,
-}
 
 local function jump_and_zz(line_data, opts)
 	if move_start_init or opts.auto_jump == false then
@@ -382,21 +390,13 @@ M.browse = function(opts)
 		win = vim.api.nvim_open_win(buf, true, open_win_opts)
 
 		-- win_set_option section
-		local win_opts = {
-			winhl = "Normal:",
-			scrolloff = 2,
-			conceallevel = 0,
-			concealcursor = "n",
-			cursorline = true,
-		}
-
 		if opts.win_opts then
 			for key, value in pairs(opts.win_opts) do
-				win_opts[key] = value
+				default_win_opts[key] = value
 			end
 		end
 
-		for key, value in pairs(win_opts) do
+		for key, value in pairs(default_win_opts) do
 			vim.api.nvim_win_set_option(win, key, value)
 		end
 
@@ -468,6 +468,14 @@ M.set = function(keymaps, pattern, opts)
 					opts.hotswap = nil
 					opts.query_index = i
 					opts.current_cursor_line_pos = vim.api.nvim_win_get_cursor(0)[1]
+
+					-- user_defaults handling
+					for key, opts_value in pairs(user_defaults) do
+						if not opts[key] then
+							opts[key] = opts_value
+						end
+					end
+
 					M.browse(opts)
 				end, { buffer = 0 })
 			end
@@ -475,6 +483,10 @@ M.set = function(keymaps, pattern, opts)
 	})
 
 	table.insert(autocmd_list, autocmd)
+end
+
+M.setup_defaults = function(opts)
+	user_defaults = opts
 end
 
 M.clear_all = function()
