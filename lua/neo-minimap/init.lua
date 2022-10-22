@@ -201,15 +201,6 @@ local function __mappings_handling(buf, win, line_data, opts)
 		vim.fn.win_gotoid(line_data.oldWin)
 	end, { buffer = buf })
 
-	vim.keymap.set("n", "-", function()
-		local tabstop = vim.bo[buf].tabstop
-		if tabstop ~= 2 then
-			vim.api.nvim_buf_set_option(buf, "tabstop", 2)
-		else
-			vim.api.nvim_buf_set_option(buf, "tabstop", 4)
-		end
-	end, { buffer = buf })
-
 	-- will open Minimap as vsplit
 	vim.keymap.set("n", "<C-s>", function()
 		vim.api.nvim_win_call(oldWin, function()
