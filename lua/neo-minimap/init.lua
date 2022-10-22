@@ -154,7 +154,7 @@ local defaults = {
 }
 
 local function jump_and_zz(line_data, opts)
-	if move_start_init then
+	if move_start_init or opts.auto_jump == false then
 		local curLine = vim.api.nvim_win_get_cursor(0)[1]
 		vim.api.nvim_win_set_cursor(
 			line_data.oldWin,
