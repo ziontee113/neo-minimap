@@ -87,11 +87,13 @@ nm.set({"keymap1", "keymap2"}, { "*.your_file_extension", "your_autocmd_pattern"
 - `c` - Toggle `conceallevel`
 - `q` / `Esc` - close the Minimap
 - `h` / `t` - toggle Treesitter highlighting for Minimap
-- `-` - toggle Minimap's tabstop between 2 and 4
 
 - `<C-h>` - toggle Minimap's height, depends on `height_toggle` option
 - `i` - **switch to previous query && set of regexes**
 - `o` - **switch to next query && set of regexes**
+
+- `<C-s>` - open Minimap in vertical split
+- `<C-v>` - open the result in vertical split
 
 - `l` - jump to location, (depends on `auto_jump`), if `true` doesn't close Minimap, if `false` do.
 - `Enter` - jump to location, closes Minimap.

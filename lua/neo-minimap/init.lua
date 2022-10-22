@@ -1,6 +1,8 @@
 local M = {}
 local autocmd_list = {}
 
+-- TODO: add keymap <C-v> to open destination in vsplit
+
 local oldBuf, oldWin
 local oldContentBuf, oldContentWin
 local move_start_init = false
@@ -209,6 +211,26 @@ local function __mappings_handling(buf, win, line_data, opts)
 			vim.api.nvim_buf_set_option(buf, "tabstop", 4)
 		end
 	end, { buffer = buf })
+
+	-- will open Minimap as vsplit
+	vim.keymap.set("n", "<C-s>", function()
+		vim.api.nvim_win_call(oldWin, function()
+			vim.cmd(":vs")
+			vim.api.nvim_win_close(win, true)
+			oldWin = vim.api.nvim_get_current_win()
+		end)
+	end, { buffer = buf })
+
+	-- will open target in vsplit
+	vim.keymap.set("n", "<C-v>", function()
+		if not opts.auto_jump then
+			vim.api.nvim_win_call(oldWin, function()
+				jump_and_zz(line_data, opts)
+				vim.api.nvim_win_close(win, true)
+				vim.cmd(":vs")
+			end)
+		end
+	end, {})
 
 	-- Hot swap mapping
 	vim.keymap.set("n", "o", function()
