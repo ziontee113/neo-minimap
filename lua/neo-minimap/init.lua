@@ -1,8 +1,6 @@
 local M = {}
 local autocmd_list = {}
 
--- TODO: add keymap <C-v> to open destination in vsplit
-
 local oldBuf, oldWin
 local oldContentBuf, oldContentWin
 local move_start_init = false
@@ -309,6 +307,8 @@ local function __mappings_handling(buf, win, line_data, opts)
 end
 
 M.browse = function(opts)
+	vim.cmd("norm! m'") -- add current cursor position to the jump list before opening Minimap
+
 	-- Queries handling
 	if opts.query then
 		if type(opts.query) == "string" then
