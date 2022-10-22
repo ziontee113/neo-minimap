@@ -133,7 +133,7 @@ nm.set("keymap", "filetype", { -- `:set filetype?` if you don't know your desire
 	},
 	width = 44, -- optional, defaults to 44, width of the minimap
 	height = 12, -- optional, defaults to 12, height of the minimap
-	hl_group = "my_hl_group", -- optional, defaults to "DiagnosticWarn"
+	hl_group = "my_hl_group", -- optional, defaults to "LineNr"
 	auto_jump = true, -- optional, defaults to `true`, auto jump when move cursor
 
     open_win_opts = {}, -- optional, for setting `nvim_open_win` options

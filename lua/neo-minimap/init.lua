@@ -10,7 +10,7 @@ local old_write_autocmd
 
 local user_defaults = {}
 local defaults = {
-	hl_group = "DiagnosticWarn",
+	hl_group = "LineNr",
 	auto_jump = true,
 	width = 44,
 	height = 12,
@@ -18,7 +18,7 @@ local defaults = {
 	query_index = 1,
 }
 local default_win_opts = {
-	winhl = "Normal:",
+	winhl = "NormalFloat:",
 	scrolloff = 2,
 	conceallevel = 0,
 	concealcursor = "n",
