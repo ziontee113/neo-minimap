@@ -3,6 +3,7 @@ local window_lib = require("neo-minimap.lib.window")
 local query_handler = require("neo-minimap.handlers.treesitter-query")
 local extmark_handler = require("neo-minimap.handlers.extmarks")
 local keymaps_handler = require("neo-minimap.handlers.keymaps")
+local autocmds_handler = require("neo-minimap.handlers.autocmds")
 
 ---@class minimap_state
 ---@field contentBuf number
@@ -21,6 +22,9 @@ local minimap_state = {}
 
 ---@param opts browse_opts
 M.browse = function(opts)
+	-- make jumplist remember current cursor position
+	vim.cmd("norm! m'")
+
 	-- get contentBuf and contentWin
 	local contentBuf = vim.api.nvim_get_current_buf()
 	local contentWin = vim.api.nvim_get_current_win()
@@ -69,6 +73,9 @@ M.browse = function(opts)
 
 	-- handle keymaps
 	keymaps_handler.handle_keymaps(minimap_state, minimap_lines_objects)
+
+	-- handle autocmds
+	autocmds_handler.handle_autocmds(minimap_state, minimap_lines_objects)
 end
 
 vim.keymap.set("n", "zi", function()
