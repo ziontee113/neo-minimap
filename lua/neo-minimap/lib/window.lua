@@ -24,7 +24,7 @@ local M = {}
 ---open floating window at the center of the editor
 ---@return number, number
 ---@param opts open_center_window_opts
-M.open_center_window = function(opts)
+M.open_win = function(opts)
 	local buf, win
 
 	-- handle buf_set_opts
