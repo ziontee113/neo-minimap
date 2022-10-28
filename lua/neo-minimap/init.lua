@@ -1,12 +1,14 @@
 local M = {}
 local window_lib = require("neo-minimap.lib.window")
 local query_handler = require("neo-minimap.handlers.treesitter-query")
+local extmark_handler = require("neo-minimap.handlers.extmarks")
 
 ---@class minimap_state
 ---@field contentBuf number
 ---@field contentWin number
 ---@field minimapBuf number
 ---@field minimapWin number
+---@field space_for_digits number
 ---@field filetype string
 
 ---@type minimap_state
@@ -45,17 +47,27 @@ M.browse = function(opts)
 
 	-- get minimap_lines_objects
 	local minimap_lines_objects = {}
+	-- get them from treesitter queries
 	for _, query in ipairs(opts.queries) do
 		query_handler.handle_query(query, minimap_state, minimap_lines_objects)
 	end
 
 	-- turn minimap_lines_objects to minimap_lines
 	local minimap_lines = {}
+
+	-- space_for_digits handling
+	local space_for_digits = extmark_handler.max_digits(minimap_lines_objects)
+	minimap_state.space_for_digits = space_for_digits
+
+	-- concatenate lines with space digits
 	for _, line in ipairs(minimap_lines_objects) do
-		table.insert(minimap_lines, line.text)
+		table.insert(minimap_lines, string.rep(" ", space_for_digits + 1) .. line.text)
 	end
 
 	vim.api.nvim_buf_set_lines(minimap_state.minimapBuf, 0, -1, false, minimap_lines)
+
+	-- handle extmarks as line numbers
+	extmark_handler.handle_extmarks(minimap_state, minimap_lines_objects)
 end
 
 vim.keymap.set("n", "zi", function()

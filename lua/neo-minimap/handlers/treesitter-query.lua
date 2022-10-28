@@ -38,7 +38,7 @@ M.handle_query = function(query, state, lines)
 	local ok, parser = pcall(ts.get_parser, state.contentBuf, filetype)
 	if not ok then
 		local parser_name = filetype_to_parsername[filetype]
-		parser = pcall(ts.get_parser, state.contentBuf, parser_name)
+		parser = ts.get_parser(state.contentBuf, parser_name)
 		filetype = parser_name
 	end
 
