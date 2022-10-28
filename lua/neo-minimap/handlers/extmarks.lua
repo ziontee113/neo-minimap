@@ -26,7 +26,7 @@ M.handle_extmarks = function(state, lines)
 		})
 	end
 
-	return ns
+	state.namespace = ns
 end
 
 return M

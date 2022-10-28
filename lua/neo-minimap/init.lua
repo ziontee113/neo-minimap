@@ -12,6 +12,7 @@ local autocmds_handler = require("neo-minimap.handlers.autocmds")
 ---@field minimapWin number
 ---@field space_for_digits number
 ---@field filetype string
+---@field namespace number
 
 ---@type minimap_state
 local minimap_state = {}
@@ -78,13 +79,14 @@ M.browse = function(opts)
 	autocmds_handler.handle_autocmds(minimap_state, minimap_lines_objects)
 end
 
-vim.keymap.set("n", "zi", function()
+vim.keymap.set("n", ",", function()
 	M.browse({
 		queries = {
 			[[
     ;; query
     ((function_declaration) @cap)
     ((assignment_statement(expression_list((function_definition) @cap))))
+    ((comment) @cap)
             ]],
 		},
 	})
