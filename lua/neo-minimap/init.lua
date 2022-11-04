@@ -141,8 +141,9 @@ local function __buffer_query_processor(opts)
 							if opts.disable_indentaion then
 								line = line:gsub("^%s+", "")
 							end
+							local rep = #tostring(row)
 							table.insert(return_tbl.lines, {
-								text = string.rep(" ", #tostring(row)) .. "\t" .. line,
+								text = string.rep(" ", rep == 1 and 2 or rep) .. "\t" .. line,
 								lnum = row - 1,
 								lcol = 0,
 							})
