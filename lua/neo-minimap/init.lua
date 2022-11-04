@@ -362,6 +362,9 @@ M.browse = function(opts)
 		buf = vim.api.nvim_create_buf(false, true)
 		vim.api.nvim_buf_set_option(buf, "filetype", opts.filetype) -- WARN: this opts.filetype got mutated in __buffer_query_processor()
 		vim.api.nvim_buf_set_option(buf, "bufhidden", "delete")
+		vim.api.nvim_buf_set_option(buf, "tabstop", 4)
+		vim.api.nvim_buf_set_option(buf, "softtabstop", 4)
+		vim.api.nvim_buf_set_option(buf, "shiftwidth", 4)
 
 		local stats = vim.api.nvim_list_uis()[1]
 		local width = stats.width
