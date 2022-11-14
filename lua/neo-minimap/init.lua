@@ -304,7 +304,7 @@ local function __mappings_handling(buf, win, line_data, opts)
 					end
 				elseif forward == false then
 					if old_search_pattern ~= pattern then
-						__protected_search("/", pattern)
+						__protected_search("?", pattern)
 					else
 						vim.cmd("norm! N")
 					end
