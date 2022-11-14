@@ -392,17 +392,13 @@ M.browse = function(opts)
 			border = "single",
 		}
 
-		if type(opts.open_win_opts) == "function" then
-			for key, value in pairs(opts.open_win_opts()) do
-				open_win_opts[key] = value
-			end
-		elseif opts.open_win_opts then
+		if opts.open_win_opts then
 			for key, value in pairs(opts.open_win_opts) do
 				open_win_opts[key] = value
 			end
-			opts.open_win_opts = open_win_opts
 		end
 
+		opts.open_win_opts = open_win_opts
 		win = vim.api.nvim_open_win(buf, true, open_win_opts)
 
 		-- win_set_option section
