@@ -67,7 +67,7 @@ nm.set({"keymap1", "keymap2"}, { "*.your_file_extension", "your_autocmd_pattern"
     height = 12, -- optional, defaults to 12, height of the minimap
     hl_group = "my_hl_group", -- highlight group of virtual text, optional, defaults to "DiagnosticWarn"
     
-    open_win_opts = {}, -- optional, for setting custom `nvim_open_win` options
+    open_win_opts = {}, -- optional, table or function for setting custom `nvim_open_win` options
     win_opts = {}, -- optional, for setting custom `nvim_win_set_option` options
     
     -- change minimap's height with <C-h>
@@ -136,7 +136,7 @@ nm.set("keymap", "filetype", { -- `:set filetype?` if you don't know your desire
 	hl_group = "my_hl_group", -- optional, defaults to "LineNr"
 	auto_jump = true, -- optional, defaults to `true`, auto jump when move cursor
 
-    open_win_opts = {}, -- optional, for setting `nvim_open_win` options
+    open_win_opts = {}, -- optional, table or function for setting `nvim_open_win` options
     win_opts = {}, -- optional, for setting `nvim_win_set_option` options
 })
 ```
