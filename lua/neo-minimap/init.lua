@@ -114,7 +114,7 @@ local function __buffer_query_processor(opts)
 
 			if not duplications_hashmap_check[row] then
 				local line_text = vim.api.nvim_buf_get_lines(current_buffer, row, row + 1, false)[1]
-				if opts.disable_indentaion then
+				if opts.disable_indentation then
 					line_text = line_text:gsub("^%s+", "")
 				end
 				table.insert(return_tbl.lines, {
@@ -137,7 +137,7 @@ local function __buffer_query_processor(opts)
 				for row, line in ipairs(buf_lines) do
 					if regex:match_str(line) then
 						if not duplications_hashmap_check[row] then
-							if opts.disable_indentaion then
+							if opts.disable_indentation then
 								line = line:gsub("^%s+", "")
 							end
 							table.insert(return_tbl.lines, {
