@@ -179,6 +179,15 @@ local function jump_and_zz(line_data, opts)
 	end
 end
 
+local function __protected_search(command, pattern)
+	local full_command = command .. pattern
+	local ok, _ = pcall(vim.cmd, full_command)
+
+	if not ok then
+		print("Pattern Not Found")
+	end
+end
+
 local old_search_pattern = ""
 local function __mappings_handling(buf, win, line_data, opts)
 	-- add cutom user buffer mappings here
@@ -289,13 +298,13 @@ local function __mappings_handling(buf, win, line_data, opts)
 			vim.keymap.set("n", keymap, function()
 				if forward == true then
 					if old_search_pattern ~= pattern then
-						vim.cmd("/" .. pattern)
+						__protected_search("/", pattern)
 					else
 						vim.cmd("norm! n")
 					end
 				elseif forward == false then
 					if old_search_pattern ~= pattern then
-						vim.cmd("?" .. pattern)
+						__protected_search("/", pattern)
 					else
 						vim.cmd("norm! N")
 					end
