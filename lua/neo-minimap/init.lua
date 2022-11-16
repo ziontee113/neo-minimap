@@ -253,7 +253,7 @@ local function __mappings_handling(buf, win, line_data, opts)
 			-- close Minimap
 			vim.api.nvim_win_close(win, true)
 		end
-	end, {})
+	end, { buffer = buf })
 
 	-- Hot swap mapping
 	vim.keymap.set("n", "o", function()
