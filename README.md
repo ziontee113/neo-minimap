@@ -75,7 +75,7 @@ nm.set({"keymap1", "keymap2"}, { "*.your_file_extension", "your_autocmd_pattern"
     -- minimap height will change to 36 after pressing <C-h>
     height_toggle = { 12, 36 },
 
-    disable_indentaion = false, -- if `true`, will remove any white space / tab at the start of the results.
+    disable_indentation = false, -- if `true`, will remove any white space / tab at the start of the results.
 })
 ```
 
