@@ -190,7 +190,18 @@ end
 
 local old_search_pattern = ""
 local function __mappings_handling(buf, win, line_data, opts)
-	-- add cutom user buffer mappings here
+	vim.keymap.set("n", "O", function()
+		jump_and_zz(line_data, opts)
+		vim.api.nvim_win_close(win, true)
+
+		local esc_key = vim.api.nvim_replace_termcodes("<Esc>", true, false, true)
+		vim.api.nvim_feedkeys(esc_key, "nx", false)
+
+		local key_code = "O"
+		local key = vim.api.nvim_replace_termcodes(key_code, true, false, true)
+		vim.api.nvim_feedkeys(key, "t", false)
+	end, { buffer = buf })
+
 	vim.keymap.set("n", "q", ":q!<cr>", { buffer = buf })
 	vim.keymap.set("n", "<Esc>", ":q!<cr>", { buffer = buf })
 	vim.keymap.set("n", "t", ":TSBufToggle highlight<cr>", { buffer = buf })
