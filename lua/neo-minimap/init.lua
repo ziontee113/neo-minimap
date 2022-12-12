@@ -16,6 +16,7 @@ local defaults = {
 	height = 12,
 	height_toggle_index = 1,
 	query_index = 1,
+	replace_cursorword_attribute = true,
 }
 local default_win_opts = {
 	winhl = "NormalFloat:",
@@ -45,6 +46,21 @@ local function __set_lnum_extmarks(buf, lines, opts)
 			virt_text_pos = "overlay",
 		})
 	end
+end
+
+local function matchstr(...)
+	local ok, ret = pcall(vim.fn.matchstr, ...)
+	return ok and ret or ""
+end
+
+local function __get_word_at_cursor()
+	local column = vim.api.nvim_win_get_cursor(0)[2]
+	local line = vim.api.nvim_get_current_line()
+
+	local left = matchstr(line:sub(1, column + 1), [[\k*$]])
+	local right = matchstr(line:sub(column + 1), [[^\k*]]):sub(2)
+
+	return left .. right
 end
 
 local function __buffer_query_processor(opts)
@@ -107,7 +123,15 @@ local function __buffer_query_processor(opts)
 		root = trees[1]:root()
 	end
 
-	local ok, iter_query = pcall(vim.treesitter.query.parse_query, opts.filetype, opts.query[opts.query_index] or "")
+	local current_query = opts.query[opts.query_index] or ""
+
+	-- Replace {cursorword} attribute with word at cursor
+	if opts.replace_cursorword_attribute then
+		local cursorword = __get_word_at_cursor()
+		current_query = current_query:gsub("%{cursorword}", cursorword)
+	end
+
+	local ok, iter_query = pcall(vim.treesitter.query.parse_query, opts.filetype, current_query)
 	if ok then
 		for _, matches, _ in iter_query:iter_matches(root, current_buffer) do
 			local row, col = matches[1]:range()
