@@ -161,6 +161,9 @@ nm.set({"zi", "zo"}, "lua", { -- press `zi` or `zo` to open the minimap, in `lua
   ]], [[
 ;; query example to find all function calls from the object that the cursor it at.
 ;; replace_cursorword_attribute need to be enabled (default) to replace the word at the cursor with the placeholder {cursorword}.
+((function_declaration name: ((identifier) @name (#eq? @name "{cursorword}"))) @cap)
+((function_call name: ((identifier) @name (#eq? @name "{cursorword}"))) @cap)
+((dot_index_expression field: ((identifier) @name (#eq? @name "{cursorword}"))) @cap)
 ((function_call name: (dot_index_expression table: (identifier) @name (#eq? @name "{cursorword}"))) @cap)
   ]],
 	regex = { [[\.insert]] }, -- 1 vim regex, matches lines with `.insert` pattern
@@ -248,3 +251,7 @@ nm.set("zo", "*/snippets/*.lua", { -- "mapping", "pattern"
 ## Feedback
 
 If you run into issues or come up with an awesome idea, please feel free to open an issue or PR.
+
+## Credits
+
+Thank you @desdic for PR #14.
