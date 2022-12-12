@@ -76,6 +76,10 @@ nm.set({"keymap1", "keymap2"}, { "*.your_file_extension", "your_autocmd_pattern"
     height_toggle = { 12, 36 },
 
     disable_indentation = false, -- if `true`, will remove any white space / tab at the start of the results.
+
+    -- Replace the placeholder called {cursorword} with the word the cursor is current on
+    -- if `false` the keyword {cursorword} will not be replaced in query.
+    replace_cursorword_attribute = true,
 })
 ```
 
@@ -148,12 +152,16 @@ Example for Lua:
 local nm = require("neo-minimap") -- for shorthand use later
 
 -- Lua
-nm.set("zi", "lua", { -- press `zi` to open the minimap, in `lua` files
+nm.set({"zi", "zo"}, "lua", { -- press `zi` or `zo` to open the minimap, in `lua` files
 	query = [[
 ;; query
 ((for_statement) @cap) ;; matches for loops
 ((function_call (dot_index_expression) @field (#eq? @field "vim.keymap.set")) @cap) ;; matches vim.keymap.set
 ((function_declaration) @cap) ;; matches function declarations
+  ]], [[
+;; query example to find all function calls from the object that the cursor it at.
+;; replace_cursorword_attribute need to be enabled (default) to replace the word at the cursor with the placeholder {cursorword}.
+((function_call name: (dot_index_expression table: (identifier) @name (#eq? @name "{cursorword}"))) @cap)
   ]],
 	regex = { [[\.insert]] }, -- 1 vim regex, matches lines with `.insert` pattern
 	search_patterns = {
