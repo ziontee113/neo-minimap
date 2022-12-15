@@ -127,7 +127,8 @@ local function __buffer_query_processor(opts)
 
 	-- Replace {cursorword} attribute with word at cursor
 	if opts.replace_cursorword_attribute then
-		current_query = current_query:gsub("%{cursorword}", opts.cursorword)
+		local cursorword = __get_word_at_cursor()
+		current_query = current_query:gsub("%{cursorword}", cursorword)
 	end
 
 	local ok, iter_query = pcall(vim.treesitter.query.parse_query, opts.filetype, current_query)
@@ -514,7 +515,6 @@ M.set = function(keymaps, pattern, opts)
 					opts.hotswap = nil
 					opts.query_index = i
 					opts.current_cursor_line_pos = vim.api.nvim_win_get_cursor(0)[1]
-					opts.cursorword = __get_word_at_cursor()
 
 					-- user_defaults handling
 					for key, opts_value in pairs(user_defaults) do
