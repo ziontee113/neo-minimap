@@ -133,7 +133,16 @@ local function __buffer_query_processor(opts)
 	local ok, iter_query = pcall(vim.treesitter.query.parse_query, opts.filetype, current_query)
 	if ok then
 		for _, matches, _ in iter_query:iter_matches(root, current_buffer) do
-			local row, col = matches[1]:range()
+			local match = matches[1]
+
+			for i, _ in pairs(matches) do
+				local curr_capture_name = iter_query.captures[i]
+				if "cap" == curr_capture_name then
+					match = matches[i]
+				end
+			end
+
+			local row, col = match:range()
 
 			if not duplications_hashmap_check[row] then
 				local line_text = vim.api.nvim_buf_get_lines(current_buffer, row, row + 1, false)[1]
