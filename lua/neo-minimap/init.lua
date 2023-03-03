@@ -234,10 +234,10 @@ local function __mappings_handling(buf, win, line_data, opts)
 		vim.api.nvim_feedkeys(key, "t", false)
 	end, { buffer = buf })
 
-	vim.keymap.set("n", "q", ":q!<cr>", { buffer = buf })
-	vim.keymap.set("n", "<Esc>", ":q!<cr>", { buffer = buf })
-	vim.keymap.set("n", "t", ":TSBufToggle highlight<cr>", { buffer = buf })
-	vim.keymap.set("n", "h", ":TSBufToggle highlight<cr>", { buffer = buf })
+	vim.keymap.set("n", "q", ":q!<cr>", { buffer = buf, silent = true })
+	vim.keymap.set("n", "<Esc>", ":q!<cr>", { buffer = buf, silent = true })
+	vim.keymap.set("n", "t", ":TSBufToggle highlight<cr>", { buffer = buf, silent = true })
+	vim.keymap.set("n", "h", ":TSBufToggle highlight<cr>", { buffer = buf, silent = true })
 	vim.keymap.set("n", "c", function()
 		if vim.wo.conceallevel > 0 then
 			vim.wo.conceallevel = 0
