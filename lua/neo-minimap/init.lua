@@ -130,7 +130,8 @@ local function __buffer_query_processor(opts)
 		current_query = current_query:gsub("%{cursorword}", opts.cursorword)
 	end
 
-	local ok, iter_query = pcall(vim.treesitter.query.parse_query, opts.filetype, current_query)
+	local parse = vim.treesitter.query.parse or vim.treesitter.query.parse_query
+	local ok, iter_query = pcall(parse, opts.filetype, current_query)
 	if ok then
 		for _, matches, _ in iter_query:iter_matches(root, current_buffer) do
 			local match = matches[1]
