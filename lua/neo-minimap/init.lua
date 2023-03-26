@@ -26,6 +26,8 @@ local default_win_opts = {
 	cursorline = true,
 }
 
+local user_did_search_in_this_session = false
+
 local function __set_lnum_extmarks(buf, lines, opts)
 	vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
 
@@ -257,9 +259,21 @@ local function __mappings_handling(buf, win, line_data, opts)
 	end, { buffer = buf })
 	vim.keymap.set("n", "<CR>", function()
 		jump_and_zz(line_data, opts)
+
+		if user_did_search_in_this_session then
+			vim.cmd([[:let @/ = ""]]) -- clear last search highlighting
+		end
+
 		vim.api.nvim_win_close(win, true)
 
 		vim.fn.win_gotoid(line_data.oldWin)
+	end, { buffer = buf })
+
+	vim.keymap.set("n", "/", function()
+		vim.api.nvim_buf_call(buf, function()
+			vim.fn.feedkeys("/", "nt!")
+			user_did_search_in_this_session = true
+		end)
 	end, { buffer = buf })
 
 	-- will open Minimap as vsplit
@@ -360,6 +374,7 @@ end
 
 M.browse = function(opts)
 	vim.cmd("norm! m'") -- add current cursor position to the jump list before opening Minimap
+	user_did_search_in_this_session = false
 
 	-- Queries handling
 	if opts.query then
