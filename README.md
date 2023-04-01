@@ -1,6 +1,6 @@
 ## Neo-Minimap
 
-Plugin for Neovim that lets you create your own *"minimap"* from *Treesitter Queries* or *Vim Regex*.
+Plugin for Neovim that lets you create your own _"minimap"_ from _Treesitter Queries_ or _Vim Regex_.
 
 https://user-images.githubusercontent.com/102876811/195559738-2508d4b0-c33e-44ad-a617-fa785e1c7a57.mp4
 
@@ -66,10 +66,10 @@ nm.set({"keymap1", "keymap2"}, { "*.your_file_extension", "your_autocmd_pattern"
     width = 44, -- optional, defaults to 44, width of the minimap
     height = 12, -- optional, defaults to 12, height of the minimap
     hl_group = "my_hl_group", -- highlight group of virtual text, optional, defaults to "DiagnosticWarn"
-    
+
     open_win_opts = {}, -- optional, for setting custom `nvim_open_win` options
     win_opts = {}, -- optional, for setting custom `nvim_win_set_option` options
-    
+
     -- change minimap's height with <C-h>
     -- this means default minimap height is 12
     -- minimap height will change to 36 after pressing <C-h>
@@ -126,7 +126,7 @@ nm.set("keymap", "filetype", { -- `:set filetype?` if you don't know your desire
 ((query_goes_here) @cap)
   ]],
 
-    regex = { 
+    regex = {
         "vim_regex_goes_here",
         [[another_vim_regex]],
     }, -- vim regex option, for when you can't or don't want to use Treesitter Queries
@@ -148,6 +148,7 @@ nm.set("keymap", "filetype", { -- `:set filetype?` if you don't know your desire
 ## Example
 
 Example for Lua:
+
 ```lua
 local nm = require("neo-minimap") -- for shorthand use later
 
@@ -177,6 +178,7 @@ nm.set({"zi", "zo"}, "lua", { -- press `zi` or `zo` to open the minimap, in `lua
 ```
 
 Example for Typescript:
+
 ```lua
 local nm = require("neo-minimap") -- for shorthand use later
 
@@ -247,6 +249,14 @@ nm.set("zo", "*/snippets/*.lua", { -- "mapping", "pattern"
 ```
 
 </details>
+
+## Available Highlight Groups
+
+| Highlight Group      | Purpose                                  |
+| -------------------- | ---------------------------------------- |
+| NeoMinimapCursorLine | highlights the current line background   |
+| NeoMinimapBorder     | highlights the border for the window     |
+| NeoMinimapBackground | highlights the background for the window |
 
 ## Feedback
 

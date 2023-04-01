@@ -19,12 +19,21 @@ local defaults = {
 	replace_cursorword_attribute = true,
 }
 local default_win_opts = {
-	winhl = "NormalFloat:",
+	winhl = "FloatBorder:NeoMinimapBorder,Normal:NeoMinimapBackground,CursorLine:NeoMinimapCursorLine",
 	scrolloff = 2,
 	conceallevel = 0,
 	concealcursor = "n",
 	cursorline = true,
 }
+
+local default_highlights = {
+	CursorLine = { link = "CursorLine" },
+	Border = { link = "FloatBorder" },
+	Background = { link = "FloatBorder" },
+}
+for hl_name, hl_val in pairs(default_highlights) do
+	vim.api.nvim_set_hl(0, "NeoMinimap" .. hl_name, hl_val)
+end
 
 local user_did_search_in_this_session = false
 
