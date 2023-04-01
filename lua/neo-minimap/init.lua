@@ -10,7 +10,7 @@ local old_write_autocmd
 
 local user_defaults = {}
 local defaults = {
-	hl_group = "LineNr",
+	hl_group = "NeoMinimapLineNr",
 	auto_jump = true,
 	width = 44,
 	height = 12,
@@ -30,6 +30,7 @@ local default_highlights = {
 	CursorLine = { link = "CursorLine" },
 	Border = { link = "FloatBorder" },
 	Background = { link = "Normal" },
+	LineNr = { link = "LineNr" }
 }
 for hl_name, hl_val in pairs(default_highlights) do
 	vim.api.nvim_set_hl(0, "NeoMinimap" .. hl_name, hl_val)

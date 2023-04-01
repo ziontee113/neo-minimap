@@ -254,6 +254,7 @@ nm.set("zo", "*/snippets/*.lua", { -- "mapping", "pattern"
 
 | Highlight Group      | Purpose                                  |
 | -------------------- | ---------------------------------------- |
+| NeoMinimapLineNr     | highlights for the Line Number           |
 | NeoMinimapCursorLine | highlights the current line background   |
 | NeoMinimapBorder     | highlights the border for the window     |
 | NeoMinimapBackground | highlights the background for the window |
