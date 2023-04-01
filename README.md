@@ -80,6 +80,13 @@ nm.set({"keymap1", "keymap2"}, { "*.your_file_extension", "your_autocmd_pattern"
     -- Replace the placeholder called {cursorword} with the word the cursor is current on
     -- if `false` the keyword {cursorword} will not be replaced in query.
     replace_cursorword_attribute = true,
+    -- replace the default highlights by default these values are linked
+	override_default_hl = {
+		NeoMinimapCursorLine = { link = "CursorLine" },
+		NeoMinimapBorder = { link = "FloatBorder" },
+		NeoMinimapBackground = { link = "Normal" },
+		NeoMinimapLineNr = { link = "LineNr" },
+	},
 })
 ```
 

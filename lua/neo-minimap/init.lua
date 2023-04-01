@@ -17,6 +17,7 @@ local defaults = {
 	height_toggle_index = 1,
 	query_index = 1,
 	replace_cursorword_attribute = true,
+	override_default_hl = {},
 }
 local default_win_opts = {
 	winhl = "FloatBorder:NeoMinimapBorder,Normal:NeoMinimapBackground,CursorLine:NeoMinimapCursorLine",
@@ -30,10 +31,13 @@ local default_highlights = {
 	CursorLine = { link = "CursorLine" },
 	Border = { link = "FloatBorder" },
 	Background = { link = "Normal" },
-	LineNr = { link = "LineNr" }
+	LineNr = { link = "LineNr" },
 }
-for hl_name, hl_val in pairs(default_highlights) do
-	vim.api.nvim_set_hl(0, "NeoMinimap" .. hl_name, hl_val)
+
+local function set_default_hl()
+	for hl_name, hl_val in pairs(default_highlights) do
+		vim.api.nvim_set_hl(0, "NeoMinimap" .. hl_name, hl_val)
+	end
 end
 
 local user_did_search_in_this_session = false
@@ -568,6 +572,14 @@ M.set = function(keymaps, pattern, opts)
 end
 
 M.setup_defaults = function(opts)
+	if opts.override_default_hl then
+		local formatted_hl_groups = {}
+		for hl_name, hl_val in pairs(opts.override_default_hl) do
+			formatted_hl_groups[string.sub(hl_name, 11, -1)] = hl_val
+		end
+		default_highlights = vim.tbl_extend("force", default_highlights, formatted_hl_groups)
+	end
+	set_default_hl()
 	user_defaults = opts
 end
 
