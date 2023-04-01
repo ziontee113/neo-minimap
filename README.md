@@ -272,4 +272,5 @@ If you run into issues or come up with an awesome idea, please feel free to open
 
 ## Credits
 
-Thank you @desdic for PR #14.
+- [@desdic](https://github.com/desdic) for PR [#14](https://github.com/ziontee113/neo-minimap/pull/14).
+- [@TheSafdarAwan](https://github.com/TheSafdarAwan) for PR [#22](https://github.com/ziontee113/neo-minimap/pull/22).
