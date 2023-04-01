@@ -29,7 +29,7 @@ local default_win_opts = {
 local default_highlights = {
 	CursorLine = { link = "CursorLine" },
 	Border = { link = "FloatBorder" },
-	Background = { link = "FloatBorder" },
+	Background = { link = "Normal" },
 }
 for hl_name, hl_val in pairs(default_highlights) do
 	vim.api.nvim_set_hl(0, "NeoMinimap" .. hl_name, hl_val)
