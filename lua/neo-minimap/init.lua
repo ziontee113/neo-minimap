@@ -511,6 +511,9 @@ M.browse = function(opts)
 	__set_lnum_extmarks(buf, line_data, opts)
 	__mappings_handling(buf, win, line_data, opts)
 
+	-- Run enter event
+	vim.api.nvim_exec_autocmds('User', { pattern = 'NeoMinimapEnter', modeline = false })
+
 	-- Cursor Move handling
 	local group = vim.api.nvim_create_augroup("Neo-Minimap-CursorMoved", { clear = true })
 	vim.api.nvim_create_autocmd("CursorMoved", {
